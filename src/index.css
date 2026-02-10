@@ -20,11 +20,9 @@
   --font-mono: 'JetBrains Mono', monospace;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Removed global * { margin: 0 } — it was overriding Tailwind's mx-auto
+   because unlayered CSS beats @layer utilities in Tailwind v4.
+   Tailwind's @layer base already resets margins/padding. */
 
 html {
   scroll-behavior: smooth;
