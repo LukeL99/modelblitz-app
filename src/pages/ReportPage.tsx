@@ -270,7 +270,7 @@ export default function ReportPage() {
             <p className="text-sm text-text-muted mb-6">
               Higher + left = better · Bubble size = response time <MetricTooltip label="Response Time" /> (smaller = faster) · Opacity = consistency <MetricTooltip label="Spread" /> (solid = predictable)
             </p>
-            <div className="relative h-[500px] border-l border-b border-surface-border/50 ml-12 mr-6">
+            <div className="relative h-[500px] border-l border-b border-surface-border/50 ml-12 mr-6 overflow-hidden">
               {/* Y-axis labels */}
               <div className="absolute -left-12 top-0 bottom-0 flex flex-col justify-between text-xs text-text-muted font-mono">
                 <span>100%</span><span>90%</span><span>80%</span><span>70%</span><span>60%</span><span>50%</span>
@@ -286,7 +286,7 @@ export default function ReportPage() {
               {/* Bubbles */}
               {MODELS.map((m) => {
                 const x = (Math.sqrt(m.costPerRun) / Math.sqrt(0.02)) * 100;
-                const y = ((m.correct - 50) / 50) * 100;
+                const y = Math.min(((m.correct - 50) / 50) * 100, 96); // clamp to avoid overflow at top
                 // Size: p95-based, inverted so smaller p95 = smaller bubble (faster = better = smaller)
                 const minSize = 20;
                 const maxSize = 64;
@@ -501,7 +501,7 @@ export default function ReportPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
               <label className="block text-sm text-text-secondary mb-2">How many extractions per day?</label>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 h-10">
                 <input
                   type="range"
                   min="100"
@@ -509,10 +509,9 @@ export default function ReportPage() {
                   step="100"
                   value={dailyExtractions}
                   onChange={(e) => setDailyExtractions(parseInt(e.target.value))}
-                  className="flex-1 accent-ember"
-                  style={{ background: `linear-gradient(to right, #F97316 ${((dailyExtractions - 100) / 9900) * 100}%, #2A2A2D ${((dailyExtractions - 100) / 9900) * 100}%)`, height: '6px', borderRadius: '3px' }}
+                  className="flex-1"
                 />
-                <span className="text-lg font-mono font-bold text-ember w-20 text-right">{dailyExtractions.toLocaleString()}</span>
+                <span className="text-lg font-mono font-bold text-ember w-24 text-right shrink-0">{dailyExtractions.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-xs text-text-muted mt-1">
                 <span>100</span>
