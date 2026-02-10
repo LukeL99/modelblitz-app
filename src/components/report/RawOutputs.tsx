@@ -14,7 +14,7 @@ export default function RawOutputs() {
           className="w-full flex items-center justify-between px-5 py-4 hover:bg-surface-raised/50 transition-colors"
           onClick={() => setShowDetails(!showDetails)}
         >
-          <span className="text-sm font-medium text-text-primary">Per-Run Details — Claude 3.5 Sonnet</span>
+          <span className="text-sm font-medium text-text-primary">Per-Run Details — Claude Sonnet 4.5</span>
           <ChevronDown className={`w-4 h-4 text-text-muted transition-transform ${showDetails ? 'rotate-180' : ''}`} />
         </button>
         {showDetails && (

@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 import { Trophy } from 'lucide-react';
 
 const miniTableData = [
-  { rank: 1, model: 'Claude 3.5 Sonnet', score: 94.2, winner: true },
+  { rank: 1, model: 'Claude Sonnet 4.5', score: 94.2, winner: true },
   { rank: 2, model: 'GPT-4o', score: 89.1, winner: false },
-  { rank: 3, model: 'Gemini 2.0 Pro', score: 88.7, winner: false },
+  { rank: 3, model: 'Gemini 3 Pro', score: 88.7, winner: false },
   { rank: 4, model: 'DeepSeek V3', score: 87.3, winner: false },
-  { rank: 5, model: 'Claude 3.5 Haiku', score: 86.1, winner: false },
+  { rank: 5, model: 'Claude Haiku 4.5', score: 86.1, winner: false },
 ];
 
 function AnimatedNumber({ target, delay }: { target: number; delay: number }) {

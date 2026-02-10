@@ -8,7 +8,7 @@ const faqs = [
   },
   {
     q: 'Which models do you test?',
-    a: 'We test 20+ models including GPT-4o, GPT-4.5, Claude 3.5 Sonnet, Gemini 2.0 Pro, DeepSeek V3, Mistral Large, Llama 3.3, and more across OpenAI, Anthropic, Google, Meta, Mistral, Cohere, and DeepSeek.',
+    a: 'We test 20+ models including GPT-5.2, GPT-4o, Claude Sonnet 4.5, Gemini 3 Pro, DeepSeek V3, Mistral Large 2, Llama 4, and more across OpenAI, Anthropic, Google, Meta, Mistral, Cohere, DeepSeek, and Amazon.',
   },
   {
     q: 'How long does a benchmark take?',
