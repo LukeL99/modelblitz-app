@@ -270,10 +270,10 @@ export default function ReportPage() {
             <p className="text-sm text-text-muted mb-6">
               Higher + left = better · Bubble size = response time <MetricTooltip label="Response Time" /> (smaller = faster) · Opacity = consistency <MetricTooltip label="Spread" /> (solid = predictable)
             </p>
-            <div className="relative h-[500px] border-l border-b border-surface-border/50 ml-12 mr-6 overflow-hidden">
+            <div className="relative h-[500px] border-l border-b border-surface-border/50 ml-12 mr-6">
               {/* Y-axis labels */}
-              <div className="absolute -left-12 top-0 bottom-0 flex flex-col justify-between text-xs text-text-muted font-mono">
-                <span>100%</span><span>90%</span><span>80%</span><span>70%</span><span>60%</span><span>50%</span>
+              <div className="absolute -left-12 top-0 bottom-0 flex flex-col justify-between text-xs text-text-muted font-mono pb-1">
+                <span></span><span>100%</span><span>90%</span><span>80%</span><span>70%</span><span>60%</span><span>50%</span>
               </div>
               {/* X-axis labels */}
               <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-xs text-text-muted font-mono">
@@ -286,7 +286,11 @@ export default function ReportPage() {
               {/* Bubbles */}
               {MODELS.map((m) => {
                 const x = (Math.sqrt(m.costPerRun) / Math.sqrt(0.02)) * 100;
-                const y = Math.min(((m.correct - 50) / 50) * 100, 96); // clamp to avoid overflow at top
+                // Map accuracy to chart Y. Range: 45% at bottom (0%), 105% at top (100%)
+                // This gives headroom so 98-100% accuracy bubbles don't clip
+                const yMin = 45;
+                const yMax = 105;
+                const y = ((m.correct - yMin) / (yMax - yMin)) * 100;
                 // Size: p95-based, inverted so smaller p95 = smaller bubble (faster = better = smaller)
                 const minSize = 20;
                 const maxSize = 64;
@@ -301,8 +305,8 @@ export default function ReportPage() {
                     key={m.model}
                     className="absolute rounded-full border-2 border-void -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-125 transition-transform group"
                     style={{
-                      left: `${Math.min(x, 97)}%`,
-                      bottom: `${Math.min(y, 97)}%`,
+                      left: `${Math.min(Math.max(x, 2), 98)}%`,
+                      bottom: `${Math.min(Math.max(y, 2), 95)}%`,
                       width: `${size}px`,
                       height: `${size}px`,
                       backgroundColor: baseColor,
