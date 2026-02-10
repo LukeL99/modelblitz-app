@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Trophy, Share2, FileDown, DollarSign, Target, Zap, ArrowUpDown,
-  ChevronDown, AlertTriangle, ArrowRight
+  Trophy, Share2, FileDown, DollarSign, Target, ArrowUpDown,
+  ChevronDown, AlertTriangle, ArrowRight, Info
 } from 'lucide-react';
 import {
   XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -10,7 +10,30 @@ import {
 } from 'recharts';
 import { MODELS, PROVIDER_COLORS, TIER_COLORS, ERROR_EXAMPLES, generateRunData } from '../data/models';
 
-type SortKey = 'rank' | 'correct' | 'p95' | 'p99' | 'ttft' | 'costPerRun';
+type SortKey = 'rank' | 'correct' | 'median' | 'p95' | 'spread' | 'costPerRun';
+
+const METRIC_TOOLTIPS: Record<string, string> = {
+  'Accuracy': 'Exact match — the extracted JSON either matches your expected output perfectly or it doesn\'t',
+  'Cost/Run': 'What you\'ll pay per extraction at current OpenRouter pricing',
+  'Response Time': 'Total wall-clock time from request sent to complete JSON received',
+  'P95': '95% of runs finished within this time — your realistic worst case',
+  'P99': 'Only 1 in 100 runs takes longer than this',
+  'Median': 'Typical response time — half your runs will be faster',
+  'Spread': 'How consistent this model is (P75 minus P25). Smaller = more predictable.',
+};
+
+function MetricTooltip({ label }: { label: string }) {
+  const text = METRIC_TOOLTIPS[label];
+  if (!text) return null;
+  return (
+    <span className="relative group/tip inline-flex ml-1 align-middle">
+      <Info size={12} className="text-text-muted cursor-help hover:text-ember transition-colors" />
+      <span className="hidden group-hover/tip:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 text-xs text-text-secondary bg-surface border border-ember/40 rounded-lg shadow-xl z-50 font-normal normal-case tracking-normal pointer-events-none">
+        {text}
+      </span>
+    </span>
+  );
+}
 
 function CorrectBadge({ pct }: { pct: number }) {
   const color = pct >= 95 ? 'bg-success/15 text-success' : pct >= 85 ? 'bg-warning/15 text-warning' : pct >= 70 ? 'bg-ember/15 text-ember' : 'bg-danger/15 text-danger';
@@ -46,7 +69,7 @@ export default function ReportPage() {
       setSortAsc(!sortAsc);
     } else {
       setSortKey(key);
-      setSortAsc(key === 'rank' || key === 'p95' || key === 'p99' || key === 'ttft' || key === 'costPerRun');
+      setSortAsc(key === 'rank' || key === 'median' || key === 'p95' || key === 'spread' || key === 'costPerRun');
     }
   };
 
@@ -63,6 +86,10 @@ export default function ReportPage() {
 
   const monthlyCost = (cost: number) => cost * dailyExtractions * 30;
   const savings = monthlyCost(mostExpensiveTop5.costPerRun) - monthlyCost(cheapestAccurate.costPerRun);
+
+  // Bubble chart helpers
+  const maxP95 = Math.max(...MODELS.map(m => m.p95));
+  const maxSpread = Math.max(...MODELS.map(m => m.spread));
 
   return (
     <div className="min-h-screen bg-void text-text-primary font-sans">
@@ -113,12 +140,10 @@ export default function ReportPage() {
           </div>
           <h3 className="mt-3 text-2xl font-bold">Gemini 3 Flash Preview</h3>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">
-            <span className="flex items-center gap-1.5"><Target size={14} className="text-success" /> 98% exact-match accuracy (49/50 runs correct)</span>
-            <span className="flex items-center gap-1.5"><Zap size={14} className="text-ember-light" /> P95: 1.8s</span>
-            <span className="flex items-center gap-1.5"><DollarSign size={14} className="text-success" /> $0.0008/run — 6.5× cheaper than GPT-4o</span>
+            <span className="flex items-center gap-1.5"><Target size={14} className="text-success" /> 98% accurate, 1.8s P95, ±0.4s spread — the most consistent AND cheapest option</span>
           </div>
           <p className="mt-4 text-text-secondary leading-relaxed">
-            Gemini 3 Flash Preview achieves the highest accuracy at the lowest cost among high-performing models. It outperforms GPT-4o (94%) while costing 6× less.
+            Gemini 3 Flash Preview achieves the highest accuracy at the lowest cost among high-performing models. It outperforms GPT-4o (94%) while costing 6× less, with the tightest response time spread of any top-tier model.
           </p>
           <div className="mt-4 flex items-center gap-2 rounded-lg bg-success/10 px-4 py-3 text-sm text-success">
             <DollarSign size={16} />
@@ -134,14 +159,14 @@ export default function ReportPage() {
                 <thead>
                   <tr className="bg-surface-raised">
                     {([
-                      { key: 'rank' as SortKey, label: 'Rank', align: 'text-left' },
-                      { key: null, label: 'Model', align: 'text-left' },
-                      { key: null, label: 'Provider', align: 'text-left' },
-                      { key: 'correct' as SortKey, label: '% Correct', align: 'text-center' },
-                      { key: 'p95' as SortKey, label: 'P95 Latency', align: 'text-center' },
-                      { key: 'p99' as SortKey, label: 'P99 Latency', align: 'text-center' },
-                      { key: 'ttft' as SortKey, label: 'TTFT', align: 'text-center' },
-                      { key: 'costPerRun' as SortKey, label: 'Cost/Run', align: 'text-right' },
+                      { key: 'rank' as SortKey, label: 'Rank', metric: null, align: 'text-left' },
+                      { key: null, label: 'Model', metric: null, align: 'text-left' },
+                      { key: null, label: 'Provider', metric: null, align: 'text-left' },
+                      { key: 'correct' as SortKey, label: 'Accuracy', metric: 'Accuracy', align: 'text-center' },
+                      { key: 'costPerRun' as SortKey, label: 'Cost/Run', metric: 'Cost/Run', align: 'text-right' },
+                      { key: 'median' as SortKey, label: 'Median', metric: 'Median', align: 'text-center' },
+                      { key: 'p95' as SortKey, label: 'P95', metric: 'P95', align: 'text-center' },
+                      { key: 'spread' as SortKey, label: 'Spread', metric: 'Spread', align: 'text-center' },
                     ] as const).map((col, i) => (
                       <th
                         key={i}
@@ -150,6 +175,7 @@ export default function ReportPage() {
                       >
                         <span className="inline-flex items-center gap-1">
                           {col.label}
+                          {col.metric && <MetricTooltip label={col.metric} />}
                           {col.key && sortKey === col.key && <ArrowUpDown className="w-3 h-3 text-ember" />}
                         </span>
                       </th>
@@ -170,10 +196,10 @@ export default function ReportPage() {
                       <td className={`px-4 py-4 font-medium ${m.rank === 1 ? 'text-text-primary' : 'text-text-secondary'}`}>{m.model}</td>
                       <td className="px-4 py-4 text-text-muted text-xs">{m.provider}</td>
                       <td className="px-4 py-4 text-center"><CorrectBadge pct={m.correct} /></td>
-                      <td className="px-4 py-4 text-center font-mono text-text-secondary">{m.p95}s</td>
-                      <td className="px-4 py-4 text-center font-mono text-text-secondary">{m.p99}s</td>
-                      <td className="px-4 py-4 text-center font-mono text-text-secondary">{m.ttft}s</td>
                       <td className="px-4 py-4 text-right font-mono text-text-secondary">${m.costPerRun}</td>
+                      <td className="px-4 py-4 text-center font-mono text-text-secondary">{m.median}s</td>
+                      <td className="px-4 py-4 text-center font-mono text-text-secondary">{m.p95}s</td>
+                      <td className="px-4 py-4 text-center font-mono text-text-secondary">±{m.spread}s</td>
                     </tr>
                   ))}
                 </tbody>
@@ -185,11 +211,16 @@ export default function ReportPage() {
         <div className="space-y-6">
           <h2 className="text-xl font-semibold mb-2">Visual Comparison</h2>
           
-          {/* Accuracy vs Cost — CSS-based scatter */}
+          {/* Bubble Chart — Accuracy vs Cost with size=speed, opacity=consistency */}
           <div className="bg-surface border border-surface-border rounded-2xl p-6 md:p-8">
-            <h3 className="text-lg font-semibold text-text-primary mb-1">Accuracy vs Cost</h3>
-            <p className="text-sm text-text-muted mb-6">Higher + left = better (more accurate, cheaper)</p>
-            <div className="relative h-[420px] border-l border-b border-surface-border/50 ml-12 mr-6">
+            <h3 className="text-lg font-semibold text-text-primary mb-1">
+              Accuracy vs Cost
+              <MetricTooltip label="Accuracy" />
+            </h3>
+            <p className="text-sm text-text-muted mb-6">
+              Higher + left = better · Bubble size = response time <MetricTooltip label="Response Time" /> (smaller = faster) · Opacity = consistency <MetricTooltip label="Spread" /> (solid = predictable)
+            </p>
+            <div className="relative h-[500px] border-l border-b border-surface-border/50 ml-12 mr-6">
               {/* Y-axis labels */}
               <div className="absolute -left-12 top-0 bottom-0 flex flex-col justify-between text-xs text-text-muted font-mono">
                 <span>100%</span><span>90%</span><span>80%</span><span>70%</span><span>60%</span><span>50%</span>
@@ -202,43 +233,77 @@ export default function ReportPage() {
               {[0, 20, 40, 60, 80, 100].map(pct => (
                 <div key={pct} className="absolute left-0 right-0 border-t border-surface-border/20" style={{ bottom: `${pct}%` }} />
               ))}
-              {/* Dots */}
+              {/* Bubbles */}
               {MODELS.map((m) => {
                 const x = (Math.sqrt(m.costPerRun) / Math.sqrt(0.02)) * 100;
                 const y = ((m.correct - 50) / 50) * 100;
+                // Size: p95-based, inverted so smaller p95 = smaller bubble (faster = better = smaller)
+                const minSize = 20;
+                const maxSize = 64;
+                const sizeRatio = m.p95 / maxP95;
+                const size = minSize + sizeRatio * (maxSize - minSize);
+                // Opacity: spread-based, lower spread = more opaque (more consistent = better)
+                const spreadRatio = m.spread / maxSpread;
+                const opacity = 1.0 - spreadRatio * 0.65; // range 0.35 to 1.0
+                const baseColor = PROVIDER_COLORS[m.provider] || '#71717A';
                 return (
                   <div
                     key={m.model}
-                    className="absolute w-5 h-5 rounded-full border-2 border-void -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-150 transition-transform group"
+                    className="absolute rounded-full border-2 border-void -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-125 transition-transform group"
                     style={{
-                      left: `${Math.min(x, 98)}%`,
-                      bottom: `${Math.min(y, 98)}%`,
-                      backgroundColor: PROVIDER_COLORS[m.provider] || '#71717A',
+                      left: `${Math.min(x, 97)}%`,
+                      bottom: `${Math.min(y, 97)}%`,
+                      width: `${size}px`,
+                      height: `${size}px`,
+                      backgroundColor: baseColor,
+                      opacity,
                     }}
-                    title={`${m.model}: ${m.correct}% correct, $${m.costPerRun}/run`}
                   >
-                    <div className="hidden group-hover:block absolute bottom-6 left-1/2 -translate-x-1/2 bg-surface-raised border border-surface-border rounded-lg px-3 py-2 text-xs whitespace-nowrap z-10 shadow-xl">
+                    <div className="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-surface border border-ember/40 rounded-lg px-3 py-2 text-xs whitespace-nowrap z-10 shadow-xl" style={{ opacity: 1 }}>
                       <p className="font-semibold text-text-primary">{m.model}</p>
-                      <p className="text-text-secondary">{m.correct}% correct · ${m.costPerRun}/run</p>
+                      <p className="text-text-secondary">{m.correct}% · ${m.costPerRun}/run · {m.p95}s P95 · ±{m.spread}s</p>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="flex flex-wrap gap-4 mt-10 justify-center">
-              {Object.entries(PROVIDER_COLORS).map(([provider, color]) => (
-                <div key={provider} className="flex items-center gap-1.5 text-xs text-text-muted">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-                  {provider}
-                </div>
-              ))}
+            {/* Legend */}
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
+              {/* Provider colors */}
+              <div className="flex flex-wrap gap-3">
+                {Object.entries(PROVIDER_COLORS).map(([provider, color]) => (
+                  <div key={provider} className="flex items-center gap-1.5 text-xs text-text-muted">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                    {provider}
+                  </div>
+                ))}
+              </div>
+              <div className="w-px h-4 bg-surface-border" />
+              {/* Size legend */}
+              <div className="flex items-center gap-2 text-xs text-text-muted">
+                <div className="w-3 h-3 rounded-full bg-text-muted/50" />
+                <span>Fast</span>
+                <div className="w-6 h-6 rounded-full bg-text-muted/50" />
+                <span>Slow</span>
+              </div>
+              <div className="w-px h-4 bg-surface-border" />
+              {/* Opacity legend */}
+              <div className="flex items-center gap-2 text-xs text-text-muted">
+                <div className="w-3 h-3 rounded-full bg-text-muted" style={{ opacity: 1 }} />
+                <span>Consistent</span>
+                <div className="w-3 h-3 rounded-full bg-text-muted" style={{ opacity: 0.35 }} />
+                <span>Erratic</span>
+              </div>
             </div>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Latency Chart */}
             <div className="bg-surface border border-surface-border rounded-2xl p-6 md:p-8">
-              <h3 className="text-lg font-semibold text-text-primary mb-6">P95 Latency Comparison</h3>
+              <h3 className="text-lg font-semibold text-text-primary mb-6">
+                P95 Latency Comparison
+                <MetricTooltip label="P95" />
+              </h3>
               <div className="h-[500px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
@@ -289,7 +354,10 @@ export default function ReportPage() {
 
             {/* Cost Chart */}
             <div className="bg-surface border border-surface-border rounded-2xl p-6 md:p-8">
-              <h3 className="text-lg font-semibold text-text-primary mb-6">Cost per Run</h3>
+              <h3 className="text-lg font-semibold text-text-primary mb-6">
+                Cost per Run
+                <MetricTooltip label="Cost/Run" />
+              </h3>
               <div className="h-[500px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
@@ -330,6 +398,49 @@ export default function ReportPage() {
                 </ResponsiveContainer>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* (d2) OpenRouter Baseline Comparison */}
+        <div className="bg-surface border border-surface-border rounded-2xl p-6 md:p-8">
+          <h2 className="text-xl font-semibold text-text-primary mb-2">📊 How Your Results Compare</h2>
+          <p className="text-sm text-text-muted mb-6">Your measured median vs OpenRouter's global median response time</p>
+          <div className="space-y-5">
+            {top5.map((m) => {
+              const ratio = m.median / m.openRouterMedian;
+              const maxVal = Math.max(m.median, m.openRouterMedian);
+              const yourPct = (m.median / maxVal) * 100;
+              const globalPct = (m.openRouterMedian / maxVal) * 100;
+              const warning = ratio > 2;
+              const faster = ratio < 0.5;
+              return (
+                <div key={m.model} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-text-primary">{m.model}</span>
+                    <div className="flex items-center gap-3 text-xs">
+                      {warning && <span className="text-warning">⚠️ Provider may have been under load</span>}
+                      {faster && <span className="text-info">💡 Your prompt is simpler than average</span>}
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-text-muted w-28 shrink-0">Your benchmark</span>
+                      <div className="flex-1 h-5 bg-surface-raised rounded overflow-hidden">
+                        <div className="h-full bg-ember rounded" style={{ width: `${yourPct}%` }} />
+                      </div>
+                      <span className="text-xs font-mono text-text-secondary w-14 text-right">{m.median}s</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-text-muted w-28 shrink-0">OpenRouter global</span>
+                      <div className="flex-1 h-5 bg-surface-raised rounded overflow-hidden">
+                        <div className="h-full bg-text-muted/40 rounded" style={{ width: `${globalPct}%` }} />
+                      </div>
+                      <span className="text-xs font-mono text-text-secondary w-14 text-right">{m.openRouterMedian}s</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
