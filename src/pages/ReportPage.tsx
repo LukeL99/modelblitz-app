@@ -22,6 +22,54 @@ const METRIC_TOOLTIPS: Record<string, string> = {
   'Spread': 'How consistent this model is (P75 minus P25). Smaller = more predictable.',
 };
 
+function DiffJson({ expected, actual }: { expected: object; actual: object }) {
+  const expLines = JSON.stringify(expected, null, 2).split('\n');
+  const actLines = JSON.stringify(actual, null, 2).split('\n');
+  const maxLines = Math.max(expLines.length, actLines.length);
+
+  const renderLines = (lines: string[], otherLines: string[], isExpected: boolean) => {
+    const result: React.ReactNode[] = [];
+    for (let i = 0; i < maxLines; i++) {
+      const line = lines[i] ?? '';
+      const other = otherLines[i] ?? '';
+      const isDiff = line !== other;
+      if (isDiff && line) {
+        result.push(
+          <div key={i} className={`${isExpected ? 'bg-success/15 text-green-400' : 'bg-red-500/5 text-red-400'}`}>
+            {line}
+          </div>
+        );
+      } else if (line) {
+        result.push(
+          <div key={i} className="text-text-secondary">
+            {line}
+          </div>
+        );
+      } else {
+        result.push(<div key={i}>&nbsp;</div>);
+      }
+    }
+    return result;
+  };
+
+  return (
+    <div className="grid md:grid-cols-2 gap-4">
+      <div>
+        <p className="text-xs font-semibold text-green-400 mb-2">✅ Expected</p>
+        <pre className="bg-[#0D0D0E] border border-surface-border rounded-lg p-4 text-xs font-mono overflow-x-auto leading-relaxed whitespace-pre-wrap">
+          {renderLines(expLines, actLines, true)}
+        </pre>
+      </div>
+      <div>
+        <p className="text-xs font-semibold text-red-400 mb-2">❌ Actual (model output)</p>
+        <pre className="bg-[#0D0D0E] border border-surface-border rounded-lg p-4 text-xs font-mono overflow-x-auto leading-relaxed whitespace-pre-wrap">
+          {renderLines(actLines, expLines, false)}
+        </pre>
+      </div>
+    </div>
+  );
+}
+
 function MetricTooltip({ label }: { label: string }) {
   const text = METRIC_TOOLTIPS[label];
   if (!text) return null;
@@ -582,21 +630,8 @@ export default function ReportPage() {
                         ))}
                       </div>
 
-                      {/* Side-by-side JSON diff */}
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-xs font-semibold text-green-400 mb-2">✅ Expected</p>
-                          <pre className="bg-[#0D0D0E] border border-surface-border rounded-lg p-4 text-xs font-mono text-green-400/80 overflow-x-auto leading-relaxed whitespace-pre-wrap">
-                            {JSON.stringify(ex.fullExpected, null, 2)}
-                          </pre>
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-red-400 mb-2">❌ Actual (model output)</p>
-                          <pre className="bg-[#0D0D0E] border border-red-400/20 rounded-lg p-4 text-xs font-mono text-red-400/80 overflow-x-auto leading-relaxed whitespace-pre-wrap">
-                            {JSON.stringify(ex.fullActual, null, 2)}
-                          </pre>
-                        </div>
-                      </div>
+                      {/* Side-by-side JSON diff with highlights */}
+                      <DiffJson expected={ex.fullExpected} actual={ex.fullActual} />
                     </div>
                   )}
                 </div>
