@@ -78,9 +78,9 @@ export default function ReportPage() {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-16 md:px-6 space-y-10">
+      <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-16 md:px-6 space-y-8">
         {/* (a) Header */}
-        <div className="bg-surface border border-surface-border rounded-xl p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-surface border border-surface-border rounded-2xl p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold text-text-primary">Benchmark Report — Receipt Data Extraction</h1>
             <p className="text-xs text-text-muted mt-1">
@@ -107,7 +107,7 @@ export default function ReportPage() {
         </div>
 
         {/* (b) Recommendation Card */}
-        <div className="rounded-xl border border-ember bg-surface p-6 md:p-8 shadow-[0_0_30px_rgba(249,115,22,0.08)]">
+        <div className="rounded-2xl border-2 border-ember bg-surface p-6 md:p-8 shadow-[0_0_40px_rgba(249,115,22,0.12)]">
           <div className="flex items-center gap-2 text-sm font-semibold text-ember uppercase tracking-wider">
             <Trophy size={16} /> Our Recommendation
           </div>
@@ -127,8 +127,8 @@ export default function ReportPage() {
         </div>
 
         {/* (c) Ranked Results Table */}
-        <div className="bg-surface border border-surface-border rounded-xl overflow-hidden">
-          <h2 className="text-lg font-semibold p-6 pb-0">All Models Ranked</h2>
+        <div className="bg-surface border border-surface-border rounded-2xl overflow-hidden">
+          <h2 className="text-lg font-semibold px-6 pt-6 pb-2">All Models Ranked</h2>
             <div className="overflow-x-auto mt-4">
               <table className="w-full text-sm min-w-[800px]">
                 <thead>
@@ -254,7 +254,7 @@ export default function ReportPage() {
                       type="number"
                       tickFormatter={(v: number) => `${v}s`}
                       tick={{ fill: '#A1A1AA', fontSize: 11 }}
-                      axisLine={{ stroke: '#2A2A2D' }}
+                      axisLine={{ stroke: '#363640' }}
                       tickLine={false}
                     />
                     <YAxis
@@ -266,7 +266,7 @@ export default function ReportPage() {
                       tickLine={false}
                     />
                     <Tooltip
-                      contentStyle={{ background: '#1E1E20', border: '1px solid #2A2A2D', borderRadius: '8px', color: '#F5F5F5', fontSize: '12px' }}
+                      contentStyle={{ background: '#242428', border: '1px solid #363640', borderRadius: '8px', color: '#F5F5F5', fontSize: '12px' }}
                       formatter={(value) => [`${value ?? 0}s`, 'P95 Latency']}
                     />
                     <Bar dataKey="p95" radius={[0, 4, 4, 0]}>
@@ -306,7 +306,7 @@ export default function ReportPage() {
                       type="number"
                       tickFormatter={(v: number) => `$${v}`}
                       tick={{ fill: '#A1A1AA', fontSize: 11 }}
-                      axisLine={{ stroke: '#2A2A2D' }}
+                      axisLine={{ stroke: '#363640' }}
                       tickLine={false}
                     />
                     <YAxis
@@ -318,7 +318,7 @@ export default function ReportPage() {
                       tickLine={false}
                     />
                     <Tooltip
-                      contentStyle={{ background: '#1E1E20', border: '1px solid #2A2A2D', borderRadius: '8px', color: '#F5F5F5', fontSize: '12px' }}
+                      contentStyle={{ background: '#242428', border: '1px solid #363640', borderRadius: '8px', color: '#F5F5F5', fontSize: '12px' }}
                       formatter={(value) => [`$${value ?? 0}`, 'Cost/Run']}
                     />
                     <Bar dataKey="cost" radius={[0, 4, 4, 0]}>
