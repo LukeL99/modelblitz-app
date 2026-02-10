@@ -78,7 +78,7 @@ export default function ReportPage() {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-16 md:px-6 space-y-12">
+      <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-16 md:px-6 space-y-10">
         {/* (a) Header */}
         <div className="bg-surface border border-surface-border rounded-xl p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -120,17 +120,16 @@ export default function ReportPage() {
           <p className="mt-4 text-text-secondary leading-relaxed">
             Gemini 3 Flash Preview achieves the highest accuracy at the lowest cost among high-performing models. It outperforms GPT-4o (94%) while costing 6× less.
           </p>
-          <div className="mt-4 flex items-center gap-2 rounded-lg bg-success/10 px-3 py-2 text-sm text-success">
+          <div className="mt-4 flex items-center gap-2 rounded-lg bg-success/10 px-4 py-3 text-sm text-success">
             <DollarSign size={16} />
             <span>At 1,000 extractions/day, switching from GPT-4o saves you <strong>$144/month</strong></span>
           </div>
         </div>
 
         {/* (c) Ranked Results Table */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">All Models Ranked</h2>
-          <div className="bg-surface border border-surface-border rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
+        <div className="bg-surface border border-surface-border rounded-xl overflow-hidden">
+          <h2 className="text-lg font-semibold p-6 pb-0">All Models Ranked</h2>
+            <div className="overflow-x-auto mt-4">
               <table className="w-full text-sm min-w-[800px]">
                 <thead>
                   <tr className="bg-surface-raised">
@@ -180,12 +179,11 @@ export default function ReportPage() {
                 </tbody>
               </table>
             </div>
-          </div>
         </div>
 
         {/* (d) Charts */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Visual Comparison</h2>
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">Visual Comparison</h2>
           
           {/* Accuracy vs Cost — CSS-based scatter */}
           <div className="bg-surface border border-surface-border rounded-xl p-5 mb-4">
@@ -206,7 +204,7 @@ export default function ReportPage() {
               ))}
               {/* Dots */}
               {MODELS.map((m) => {
-                const x = (m.costPerRun / 0.02) * 100;
+                const x = (Math.sqrt(m.costPerRun) / Math.sqrt(0.02)) * 100;
                 const y = ((m.correct - 50) / 50) * 100;
                 return (
                   <div
@@ -412,7 +410,7 @@ export default function ReportPage() {
 
         {/* (f) Error Analysis */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">🔍 Where Models Failed</h2>
+          <h2 className="text-lg font-semibold mb-4">🔍 Where Models Failed</h2>
           <div className="space-y-3">
             {ERROR_EXAMPLES.map((ex) => {
               const isExpanded = expandedErrors.includes(ex.model);
@@ -482,7 +480,7 @@ export default function ReportPage() {
 
         {/* (g) Raw Run Data */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">📊 Raw Run Data</h2>
+          <h2 className="text-lg font-semibold mb-4">📊 Raw Run Data</h2>
           <div className="space-y-3">
             {MODELS.map((m) => {
               const isExpanded = expandedRuns.includes(m.model);

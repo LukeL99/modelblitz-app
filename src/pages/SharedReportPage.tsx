@@ -76,7 +76,7 @@ export default function SharedReportPage() {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-16 md:px-6 space-y-12">
+      <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-16 md:px-6 space-y-10">
         {/* Header */}
         <div className="bg-surface border border-surface-border rounded-xl p-5 md:p-6">
           <h1 className="text-xl font-semibold text-text-primary">Benchmark Report — Receipt Data Extraction</h1>
@@ -101,10 +101,9 @@ export default function SharedReportPage() {
         </div>
 
         {/* Table */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">All Models Ranked</h2>
-          <div className="bg-surface border border-surface-border rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
+        <div className="bg-surface border border-surface-border rounded-xl overflow-hidden">
+          <h2 className="text-lg font-semibold p-6 pb-0">All Models Ranked</h2>
+            <div className="overflow-x-auto mt-4">
               <table className="w-full text-sm min-w-[800px]">
                 <thead>
                   <tr className="bg-surface-raised">
@@ -149,12 +148,11 @@ export default function SharedReportPage() {
                 </tbody>
               </table>
             </div>
-          </div>
         </div>
 
         {/* Charts */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Visual Comparison</h2>
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">Visual Comparison</h2>
           <div className="bg-surface border border-surface-border rounded-xl p-5 mb-4">
             <h3 className="text-base font-semibold text-text-primary mb-4">Accuracy vs Cost</h3>
             <div className="h-[400px]">
@@ -248,7 +246,7 @@ export default function SharedReportPage() {
 
         {/* Error Analysis */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">🔍 Where Models Failed</h2>
+          <h2 className="text-lg font-semibold mb-4">🔍 Where Models Failed</h2>
           <div className="space-y-3">
             {ERROR_EXAMPLES.map((ex) => {
               const isExpanded = expandedErrors.includes(ex.model);
@@ -302,7 +300,7 @@ export default function SharedReportPage() {
 
         {/* Raw Run Data */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">📊 Raw Run Data</h2>
+          <h2 className="text-lg font-semibold mb-4">📊 Raw Run Data</h2>
           <div className="space-y-3">
             {MODELS.map((m) => {
               const isExpanded = expandedRuns.includes(m.model);
