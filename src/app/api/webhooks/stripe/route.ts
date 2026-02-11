@@ -160,18 +160,12 @@ export async function POST(request: NextRequest) {
     );
 
     // Defer benchmark execution via after()
-    // engine.ts does not exist yet (Plan 02-03 creates it).
-    // The dynamic import will fail gracefully in the background.
     after(async () => {
       try {
-        // @ts-expect-error -- engine.ts created in Plan 02-03, import will fail gracefully until then
         const { runBenchmark } = await import("@/lib/benchmark/engine");
         await runBenchmark(report.id);
       } catch (err) {
-        console.error(
-          "[webhook:after] Benchmark engine not available yet:",
-          err
-        );
+        console.error("[webhook:after] Benchmark engine error:", err);
       }
     });
 
