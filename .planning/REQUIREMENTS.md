@@ -102,51 +102,51 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| AUTH-04 | — | Pending |
-| AUTH-05 | — | Pending |
-| UPLD-01 | — | Pending |
-| UPLD-02 | — | Pending |
-| UPLD-03 | — | Pending |
-| UPLD-04 | — | Pending |
-| WIZD-01 | — | Pending |
-| WIZD-02 | — | Pending |
-| WIZD-03 | — | Pending |
-| WIZD-04 | — | Pending |
-| WIZD-05 | — | Pending |
-| PAY-01 | — | Pending |
-| PAY-02 | — | Pending |
-| PAY-03 | — | Pending |
-| BENCH-01 | — | Pending |
-| BENCH-02 | — | Pending |
-| BENCH-03 | — | Pending |
-| BENCH-04 | — | Pending |
-| BENCH-05 | — | Pending |
-| BENCH-06 | — | Pending |
-| LIVE-01 | — | Pending |
-| LIVE-02 | — | Pending |
-| LIVE-03 | — | Pending |
-| RPT-01 | — | Pending |
-| RPT-02 | — | Pending |
-| RPT-03 | — | Pending |
-| RPT-04 | — | Pending |
-| RPT-05 | — | Pending |
-| RPT-06 | — | Pending |
-| RPT-07 | — | Pending |
-| RPT-08 | — | Pending |
-| RPT-09 | — | Pending |
-| RPT-10 | — | Pending |
-| RPT-11 | — | Pending |
-| RPT-12 | — | Pending |
-| RPT-13 | — | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| UPLD-01 | Phase 1 | Pending |
+| UPLD-02 | Phase 1 | Pending |
+| UPLD-03 | Phase 1 | Pending |
+| UPLD-04 | Phase 1 | Pending |
+| WIZD-01 | Phase 1 | Pending |
+| WIZD-02 | Phase 1 | Pending |
+| WIZD-03 | Phase 1 | Pending |
+| WIZD-04 | Phase 1 | Pending |
+| WIZD-05 | Phase 1 | Pending |
+| PAY-01 | Phase 2 | Pending |
+| PAY-02 | Phase 2 | Pending |
+| PAY-03 | Phase 2 | Pending |
+| BENCH-01 | Phase 2 | Pending |
+| BENCH-02 | Phase 2 | Pending |
+| BENCH-03 | Phase 2 | Pending |
+| BENCH-04 | Phase 2 | Pending |
+| BENCH-05 | Phase 2 | Pending |
+| BENCH-06 | Phase 2 | Pending |
+| LIVE-01 | Phase 3 | Pending |
+| LIVE-02 | Phase 3 | Pending |
+| LIVE-03 | Phase 3 | Pending |
+| RPT-01 | Phase 3 | Pending |
+| RPT-02 | Phase 3 | Pending |
+| RPT-03 | Phase 3 | Pending |
+| RPT-04 | Phase 3 | Pending |
+| RPT-05 | Phase 3 | Pending |
+| RPT-06 | Phase 3 | Pending |
+| RPT-07 | Phase 3 | Pending |
+| RPT-08 | Phase 3 | Pending |
+| RPT-09 | Phase 3 | Pending |
+| RPT-10 | Phase 3 | Pending |
+| RPT-11 | Phase 3 | Pending |
+| RPT-12 | Phase 3 | Pending |
+| RPT-13 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 39 total
-- Mapped to phases: 0
-- Unmapped: 39 ⚠️
+- Mapped to phases: 39
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-11*
-*Last updated: 2026-02-11 after initial definition*
+*Last updated: 2026-02-11 after roadmap creation*
