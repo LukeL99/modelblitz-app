@@ -6,6 +6,7 @@ import { WizardShell } from "@/components/wizard/wizard-shell";
 import { StepConfig } from "@/components/wizard/step-config";
 import { StepUpload } from "@/components/wizard/step-upload";
 import { StepSchema } from "@/components/wizard/step-schema";
+import { ConfirmationScreen } from "@/components/wizard/confirmation-screen";
 import type {
   WizardStep,
   Priority,
@@ -60,6 +61,7 @@ export default function NewBenchmarkPage() {
   );
   const [savedSchemaData, setSavedSchemaData] =
     useState<SavedSchemaData | null>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const configSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const uploadSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -283,7 +285,7 @@ export default function NewBenchmarkPage() {
     [saveDraftStep]
   );
 
-  // Handle benchmark completion: set draft to 'ready'
+  // Handle benchmark completion: set draft to 'ready' and show confirmation
   const handleComplete = useCallback(async () => {
     if (!draftId) return;
     setSaveStatus("saving");
@@ -303,6 +305,7 @@ export default function NewBenchmarkPage() {
         setCompletedSteps(
           (prev) => new Set([...prev, "config", "upload", "schema"])
         );
+        setShowConfirmation(true);
       } else {
         setSaveStatus("error");
       }
@@ -341,6 +344,20 @@ export default function NewBenchmarkPage() {
             </span>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // Show confirmation screen after wizard completion
+  if (showConfirmation && draftId) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-8">
+        <ConfirmationScreen
+          draftId={draftId}
+          configData={configData}
+          selectedModels={savedSchemaData?.selectedModelIds ?? []}
+          onCancel={() => setShowConfirmation(false)}
+        />
       </div>
     );
   }
