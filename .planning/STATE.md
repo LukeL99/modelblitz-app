@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 ## Current Position
 
 Phase: 1 of 3 (Configure Benchmark)
-Plan: 0 of 3 in current phase
-Status: Ready to plan
-Last activity: 2026-02-11 -- Roadmap created
+Plan: 1 of 4 in current phase
+Status: Executing
+Last activity: 2026-02-11 -- Completed 01-01-PLAN.md
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 8%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: ~8 min
+- Total execution time: 0.13 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-configure-benchmark | 1 | ~8 min | ~8 min |
 
 **Recent Trend:**
-- Last 5 plans: -
-- Trend: -
+- Last 5 plans: 01-01 (~8 min)
+- Trend: Starting
 
 *Updated after each plan completion*
 
@@ -46,17 +46,22 @@ Recent decisions affecting current work:
 - [Init]: Auth included in v1 (user override of research recommendation to defer)
 - [Init]: Supabase Realtime for progress delivery instead of direct SSE (research recommendation)
 - [Init]: Fresh Next.js build, existing repo is prototype reference only
+- [01-01]: Supabase middleware gracefully skips when env vars not set (development workflow)
+- [01-01]: Tailwind v4 CSS-native @theme with custom dark-warm palette variables
+- [01-01]: 25 curated vision models across 5 tiers (free/budget/mid/premium/ultra)
+- [01-01]: Separate JSONB columns per wizard step to prevent race conditions
 
 ### Pending Todos
 
-None yet.
+- User must configure Supabase project and set env vars in .env.local
+- User must run database migration in Supabase SQL Editor
 
 ### Blockers/Concerns
 
-None yet.
+- Next.js 16 warns middleware is deprecated in favor of "proxy" -- informational only, middleware still works.
 
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Roadmap created, ready to plan Phase 1
-Resume file: None
+Stopped at: Completed 01-01-PLAN.md (project foundation)
+Resume file: .planning/phases/01-configure-benchmark/01-01-SUMMARY.md
