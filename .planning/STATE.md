@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 ## Current Position
 
 Phase: 2 of 3 (Pay and Run)
-Plan: 2 of 3 in current phase
+Plan: 3 of 3 in current phase (02-01 and 02-02 complete, 02-03 remaining)
 Status: Executing
-Last activity: 2026-02-11 -- Completed 02-02-PLAN.md (benchmark engine utilities)
+Last activity: 2026-02-11 -- Completed 02-01-PLAN.md (Stripe payment infrastructure)
 
-Progress: [████████████░░░] 53%
+Progress: [████████████░░░] 56%
 
 ## Performance Metrics
 
@@ -31,8 +31,8 @@ Progress: [████████████░░░] 53%
 | 02-pay-and-run | 2 | ~20 min | ~10 min |
 
 **Recent Trend:**
-- Last 6 plans: 01-04 (~6 min), 01-05 (~5 min), 01-06 (~3 min), 02-01 (~6 min), 02-02 (~14 min)
-- Trend: TDD plans take longer (expected)
+- Last 6 plans: 01-04 (~6 min), 01-05 (~5 min), 01-06 (~3 min), 02-01 (~16 min), 02-02 (~14 min)
+- Trend: Phase 2 plans larger scope (expected)
 
 *Updated after each plan completion*
 
@@ -68,6 +68,9 @@ Recent decisions affecting current work:
 - [01-06]: Slot-to-image mapping via array index (images[slotIndex]) for direct slot-to-image correspondence
 - [01-06]: Saved state managed locally per ImageCard, initialized from jsonValid on mount for draft restoration
 - [01-06]: SlotDropzone kept in image-uploader.tsx with renamed export (same file, different component name)
+- [02-01]: Stripe client uses lazy initialization via getStripe() to prevent build failures without API keys
+- [02-01]: Stripe API version 2026-01-28.clover matches installed stripe package type constraints
+- [02-01]: Webhook uses @ts-expect-error for engine import since engine.ts is created in Plan 02-03
 - [02-02]: CostTracker uses softCeiling as hardCeiling when only one arg provided
 - [02-02]: Vitest with node environment and @/ path alias matching tsconfig
 - [02-02]: Mock runner seeds random from modelId+imageUrl for deterministic varied results
@@ -85,5 +88,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed 02-02-PLAN.md (benchmark engine utilities -- JSON compare, backoff, cost tracker, runner)
-Resume file: .planning/phases/02-pay-and-run/02-02-SUMMARY.md
+Stopped at: Completed 02-01-PLAN.md (Stripe payment infrastructure, checkout flow, mock system)
+Resume file: .planning/phases/02-pay-and-run/02-01-SUMMARY.md
