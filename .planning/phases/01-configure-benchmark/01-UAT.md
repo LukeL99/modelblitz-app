@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: complete
 phase: 01-configure-benchmark
 source: 01-01-SUMMARY.md, 01-02-SUMMARY.md, 01-03-SUMMARY.md, 01-04-SUMMARY.md
 started: 2026-02-11T21:00:00Z
-updated: 2026-02-11T21:10:00Z
+updated: 2026-02-11T22:30:00Z
 ---
 
 ## Current Test
@@ -37,10 +37,8 @@ expected: Navigating to /benchmark/new shows a 3-step indicator (Configure/Uploa
 result: pass
 
 ### 7. Step 2 — Image Upload
-expected: After completing Step 1 and clicking Continue, Step 2 shows a drag-and-drop upload zone. Dropping or selecting images (PNG/JPG) displays thumbnail cards with status badges. Images upload successfully to Supabase Storage.
-result: issue
-reported: "if I choose 1 image in phase 1, it doesn't limit me to uploading 1 image in phase 2 (I can upload as many as I want). Instead of 1 upload card, there should be as many cards as the user selected in phase 1 (Image 1, Image 2, Image 3, Image 4) with a drag to upload or click to upload zone. When the user uploads the image, it should collapse down to thumbnail (don't show it full size) and it should prompt for the JSON schema in the editor. If the user clicks the thumbnail, then show the full size image. When the user clicks Save on each image, it should collapse that card to clean up screen real estate for uploading the other images and JSON"
-severity: major
+expected: Step 2 shows exactly N card slots matching sample count from Step 1. Each card has its own embedded dropzone. Uploading shows thumbnail + JSON editor + Save button. Clicking thumbnail toggles full-size preview. Save validates JSON and collapses to compact row. Progress shows saved/total.
+result: pass (re-tested after gap closure 01-05, 01-06)
 
 ### 8. Step 2 — JSON Editor & Gate
 expected: Each image card expands to reveal a CodeMirror JSON editor. Entering invalid JSON shows red underline errors. The Continue button to Step 3 is disabled until every uploaded image has valid JSON entered.
@@ -57,29 +55,11 @@ result: pass
 ## Summary
 
 total: 10
-passed: 9
-issues: 1
+passed: 10
+issues: 0
 pending: 0
 skipped: 0
 
 ## Gaps
 
-- truth: "Step 2 limits uploads to sample count from Step 1 and uses structured card-per-image UX"
-  status: failed
-  reason: "User reported: if I choose 1 image in phase 1, it doesn't limit me to uploading 1 image in phase 2 (I can upload as many as I want). Instead of 1 upload card, there should be as many cards as the user selected in phase 1 (Image 1, Image 2, Image 3, Image 4) with a drag to upload or click to upload zone. When the user uploads the image, it should collapse down to thumbnail (don't show it full size) and it should prompt for the JSON schema in the editor. If the user clicks the thumbnail, then show the full size image. When the user clicks Save on each image, it should collapse that card to clean up screen real estate for uploading the other images and JSON"
-  severity: major
-  test: 7
-  root_cause: "StepUpload uses a single shared dropzone with dynamic card creation capped at MAX_IMAGES=10, ignoring sampleCount from Step 1. ImageCard has no three-state lifecycle (empty/editing/saved) and no Save button. Newly uploaded images start fully expanded instead of showing thumbnail with JSON editor."
-  artifacts:
-    - path: "src/components/wizard/step-upload.tsx"
-      issue: "Single shared dropzone + dynamic cards instead of N pre-defined upload slots based on sampleCount"
-    - path: "src/components/wizard/image-uploader.tsx"
-      issue: "Uses MAX_IMAGES (10) as limit, never receives or respects sampleCount"
-    - path: "src/components/wizard/image-card.tsx"
-      issue: "Only two states (expanded/collapsed), needs three (empty/editing/saved) plus Save button and thumbnail-click-to-expand"
-  missing:
-    - "Restructure StepUpload to pre-initialize N empty slots based on sampleCount, each card has its own embedded dropzone"
-    - "Add three-state ImageCard lifecycle: empty (upload zone), editing (thumbnail + JSON editor + Save), saved (collapsed thumbnail row)"
-    - "Add Save button per card that validates JSON and collapses the card"
-    - "Thumbnail-click-to-expand for viewing full-size image"
-  debug_session: ".planning/debug/step2-upload-cards.md"
+[none - all gaps closed]
