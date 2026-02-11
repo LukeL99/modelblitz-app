@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 ## Current Position
 
 Phase: 1 of 3 (Configure Benchmark)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: Executing
-Last activity: 2026-02-11 -- Completed 01-01-PLAN.md
+Last activity: 2026-02-11 -- Completed 01-02-PLAN.md
 
-Progress: [██░░░░░░░░] 8%
+Progress: [████░░░░░░] 17%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: ~8 min
-- Total execution time: 0.13 hours
+- Total plans completed: 2
+- Average duration: ~5.5 min
+- Total execution time: 0.18 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-configure-benchmark | 1 | ~8 min | ~8 min |
+| 01-configure-benchmark | 2 | ~11 min | ~5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~8 min)
-- Trend: Starting
+- Last 5 plans: 01-01 (~8 min), 01-02 (~3 min)
+- Trend: Accelerating
 
 *Updated after each plan completion*
 
@@ -50,6 +50,9 @@ Recent decisions affecting current work:
 - [01-01]: Tailwind v4 CSS-native @theme with custom dark-warm palette variables
 - [01-01]: 25 curated vision models across 5 tiers (free/budget/mid/premium/ultra)
 - [01-01]: Separate JSONB columns per wizard step to prevent race conditions
+- [01-02]: Fixed middleware route protection to match actual URL paths not route group names
+- [01-02]: Social buttons above divider, email/password form below on auth pages
+- [01-02]: Sign-out button as separate client component to keep app layout as server component
 
 ### Pending Todos
 
@@ -63,5 +66,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed 01-01-PLAN.md (project foundation)
-Resume file: .planning/phases/01-configure-benchmark/01-01-SUMMARY.md
+Stopped at: Completed 01-02-PLAN.md (auth UI & dashboard)
+Resume file: .planning/phases/01-configure-benchmark/01-02-SUMMARY.md
