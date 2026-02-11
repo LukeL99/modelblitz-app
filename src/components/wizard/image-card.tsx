@@ -51,7 +51,7 @@ export function ImageCard({
   onValidChange,
   onRemove,
 }: ImageCardProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(!image.expectedJson.trim());
 
   return (
     <div className="border border-surface-border rounded-xl bg-surface overflow-hidden">

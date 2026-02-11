@@ -11,7 +11,7 @@
 -- Ensure the benchmark-images bucket exists (idempotent)
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('benchmark-images', 'benchmark-images', true)
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET public = true;
 
 -- Allow authenticated users to upload images to their own folder
 CREATE POLICY "Users can upload own images"

@@ -1,11 +1,50 @@
 "use client";
 
 import CodeMirror from "@uiw/react-codemirror";
-import { json, jsonParseLinter } from "@codemirror/lang-json";
-import { linter } from "@codemirror/lint";
+import { json } from "@codemirror/lang-json";
+import { linter, type Diagnostic } from "@codemirror/lint";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
+import type { EditorView } from "@codemirror/view";
 import { useCallback, useRef, useState } from "react";
 import { Upload } from "lucide-react";
+
+/** Custom JSON linter that positions errors at the actual problem location */
+function jsonLinter() {
+  return linter((view: EditorView): Diagnostic[] => {
+    const doc = view.state.doc.toString();
+    if (!doc.trim()) return [];
+    try {
+      JSON.parse(doc);
+    } catch (e) {
+      if (!(e instanceof SyntaxError)) return [];
+      let pos = 0;
+      const msg = e.message;
+      // V8: "... at position 15"
+      const posMatch = msg.match(/at position (\d+)/);
+      if (posMatch) {
+        pos = Math.min(+posMatch[1], doc.length);
+      } else {
+        // Firefox: "... at line 2 column 5"
+        const lineMatch = msg.match(/at line (\d+) column (\d+)/);
+        if (lineMatch) {
+          const line = view.state.doc.line(+lineMatch[1]);
+          pos = Math.min(line.from + (+lineMatch[2]) - 1, doc.length);
+        }
+      }
+      // Create a visible range: extend to next word boundary or at least 1 char
+      let to = pos;
+      if (pos < doc.length) {
+        to = pos + 1;
+        // Extend to end of the problematic token
+        while (to < doc.length && /\S/.test(doc[to]) && !/[,\]}\n]/.test(doc[to])) {
+          to++;
+        }
+      }
+      return [{ from: pos, to: Math.max(to, pos + 1), message: msg, severity: "error" }];
+    }
+    return [];
+  });
+}
 
 interface JsonEditorProps {
   value: string;
@@ -89,7 +128,7 @@ export function JsonEditor({ value, onChange, onValidChange }: JsonEditorProps) 
         value={value}
         onChange={handleChange}
         theme={vscodeDark}
-        extensions={[json(), linter(jsonParseLinter())]}
+        extensions={[json(), jsonLinter()]}
         basicSetup={{
           lineNumbers: true,
           foldGutter: true,

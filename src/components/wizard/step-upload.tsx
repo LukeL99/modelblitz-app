@@ -90,19 +90,11 @@ export function StepUpload({
 
           if (uploadErr) throw uploadErr;
 
-          // Get public URL
-          const {
-            data: { publicUrl },
-          } = supabase.storage.from("benchmark-images").getPublicUrl(path);
-
-          // Revoke the object URL since we now have the real URL
-          URL.revokeObjectURL(entry.publicUrl);
-
-          // Update the entry with real data using latest ref
+          // Update the entry with storage path, keep blob URL for in-session preview
           const current = imagesRef.current;
           onImagesChange(
             current.map((img) =>
-              img.id === entry.id ? { ...img, path, publicUrl } : img
+              img.id === entry.id ? { ...img, path } : img
             )
           );
         } catch (err) {
