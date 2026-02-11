@@ -5,7 +5,14 @@ import { useQueryState, parseAsStringEnum } from "nuqs";
 import { WizardShell } from "@/components/wizard/wizard-shell";
 import { StepConfig } from "@/components/wizard/step-config";
 import { StepUpload } from "@/components/wizard/step-upload";
-import type { WizardStep, Priority, Strategy, ImageEntry } from "@/types/wizard";
+import { StepSchema } from "@/components/wizard/step-schema";
+import type {
+  WizardStep,
+  Priority,
+  Strategy,
+  ImageEntry,
+  SchemaSource,
+} from "@/types/wizard";
 import type { BenchmarkDraft } from "@/types/database";
 import {
   DEFAULT_PRIORITIES,
@@ -27,6 +34,14 @@ const DEFAULT_CONFIG: ConfigData = {
   sampleCount: DEFAULT_SAMPLE_COUNT,
 };
 
+interface SavedSchemaData {
+  inferredSchema?: Record<string, unknown> | null;
+  userSchema?: string;
+  prompt?: string;
+  schemaSource?: SchemaSource;
+  selectedModelIds?: string[];
+}
+
 export default function NewBenchmarkPage() {
   const [step, setStep] = useQueryState(
     "step",
@@ -43,6 +58,8 @@ export default function NewBenchmarkPage() {
   const [completedSteps, setCompletedSteps] = useState<Set<WizardStep>>(
     new Set()
   );
+  const [savedSchemaData, setSavedSchemaData] =
+    useState<SavedSchemaData | null>(null);
 
   const configSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const uploadSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -107,16 +124,50 @@ export default function NewBenchmarkPage() {
     const ud = draft.upload_data as Record<string, unknown> | null;
     if (ud && Object.keys(ud).length > 0) {
       const loadedImages = (ud.images as ImageEntry[]) ?? [];
-      setImages(loadedImages);
-      if (loadedImages.length > 0 && loadedImages.every((img) => img.jsonValid)) {
+      // Re-parse JSON for loaded images
+      const imagesWithParsed = loadedImages.map((img) => {
+        if (img.expectedJson && img.jsonValid) {
+          try {
+            return { ...img, parsedJson: JSON.parse(img.expectedJson) };
+          } catch {
+            return { ...img, parsedJson: null, jsonValid: false };
+          }
+        }
+        return img;
+      });
+      setImages(imagesWithParsed);
+      if (
+        imagesWithParsed.length > 0 &&
+        imagesWithParsed.every((img) => img.jsonValid)
+      ) {
         setCompletedSteps((prev) => new Set([...prev, "config", "upload"]));
+      }
+    }
+
+    // Load schema data
+    const sd = draft.schema_data as Record<string, unknown> | null;
+    if (sd && Object.keys(sd).length > 0) {
+      setSavedSchemaData({
+        inferredSchema: sd.inferredSchema as Record<string, unknown> | null,
+        userSchema: sd.userSchema as string | undefined,
+        prompt: sd.prompt as string | undefined,
+        schemaSource: sd.schemaSource as SchemaSource | undefined,
+        selectedModelIds: sd.selectedModelIds as string[] | undefined,
+      });
+      if (sd.prompt && (sd.prompt as string).trim().length >= 20) {
+        setCompletedSteps((prev) =>
+          new Set([...prev, "config", "upload", "schema"])
+        );
       }
     }
   }
 
   // Shared save utility
   const saveDraftStep = useCallback(
-    async (stepName: "config" | "upload", data: Record<string, unknown>) => {
+    async (
+      stepName: "config" | "upload" | "schema",
+      data: Record<string, unknown>
+    ) => {
       if (!draftId) return;
       setSaveStatus("saving");
       try {
@@ -210,6 +261,56 @@ export default function NewBenchmarkPage() {
     [step, setStep]
   );
 
+  // Save schema data handler
+  const handleSaveSchema = useCallback(
+    (data: {
+      inferredSchema: Record<string, unknown> | null;
+      userSchema: string;
+      prompt: string;
+      schemaSource: SchemaSource;
+      selectedModelIds: string[];
+      estimatedCost: number;
+      estimatedRuns: number;
+    }) => {
+      saveDraftStep("schema", {
+        inferredSchema: data.inferredSchema,
+        userSchema: data.userSchema,
+        prompt: data.prompt,
+        schemaSource: data.schemaSource,
+        selectedModelIds: data.selectedModelIds,
+      });
+    },
+    [saveDraftStep]
+  );
+
+  // Handle benchmark completion: set draft to 'ready'
+  const handleComplete = useCallback(async () => {
+    if (!draftId) return;
+    setSaveStatus("saving");
+    try {
+      // Update draft status to 'ready' and save final computed fields
+      const res = await fetch(`/api/drafts/${draftId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          step: "schema",
+          data: savedSchemaData ?? {},
+          status: "ready",
+        }),
+      });
+      if (res.ok) {
+        setSaveStatus("saved");
+        setCompletedSteps(
+          (prev) => new Set([...prev, "config", "upload", "schema"])
+        );
+      } else {
+        setSaveStatus("error");
+      }
+    } catch {
+      setSaveStatus("error");
+    }
+  }, [draftId, savedSchemaData, saveDraftStep]);
+
   // Determine if current step can continue
   const canContinue = (() => {
     if (step === "config") {
@@ -220,10 +321,9 @@ export default function NewBenchmarkPage() {
       );
     }
     if (step === "upload") {
-      return (
-        images.length >= 1 && images.every((img) => img.jsonValid)
-      );
+      return images.length >= 1 && images.every((img) => img.jsonValid);
     }
+    // Step 3 uses its own "Ready for Payment" CTA, not the Continue button
     return false;
   })();
 
@@ -284,10 +384,17 @@ export default function NewBenchmarkPage() {
             onImagesChange={handleImagesChange}
           />
         )}
-        {step === "schema" && (
-          <div className="text-text-muted text-center py-20">
-            <p>Step 3: Schema & Prompt (Plan 01-04)</p>
-          </div>
+        {step === "schema" && draftId && (
+          <StepSchema
+            images={images}
+            priorities={configData.priorities}
+            strategy={configData.strategy}
+            sampleCount={configData.sampleCount}
+            draftId={draftId}
+            onSaveSchema={handleSaveSchema}
+            onComplete={handleComplete}
+            savedSchemaData={savedSchemaData}
+          />
         )}
       </WizardShell>
     </>

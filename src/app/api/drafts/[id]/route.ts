@@ -31,8 +31,8 @@ export async function GET(
 
 /**
  * PATCH /api/drafts/[id]
- * Update a draft's step data.
- * Body: { step: 'config' | 'upload' | 'schema', data: object }
+ * Update a draft's step data and optionally its status.
+ * Body: { step: 'config' | 'upload' | 'schema', data: object, status?: 'ready' }
  */
 export async function PATCH(
   request: NextRequest,
@@ -57,19 +57,52 @@ export async function PATCH(
 
   try {
     const body = await request.json();
-    const { step, data } = body as {
-      step: "config" | "upload" | "schema";
-      data: Record<string, unknown>;
-    };
+    const { step, data, status, selectedModels, estimatedCost, estimatedRuns } =
+      body as {
+        step: "config" | "upload" | "schema";
+        data: Record<string, unknown>;
+        status?: string;
+        selectedModels?: string[];
+        estimatedCost?: number;
+        estimatedRuns?: number;
+      };
 
     if (!step || !data || !["config", "upload", "schema"].includes(step)) {
       return NextResponse.json(
-        { error: "Invalid request. Requires step ('config'|'upload'|'schema') and data." },
+        {
+          error:
+            "Invalid request. Requires step ('config'|'upload'|'schema') and data.",
+        },
         { status: 400 }
       );
     }
 
+    // Save step data
     await saveDraftStep(supabase, id, step, data);
+
+    // If status update requested (e.g., setting to 'ready' on completion)
+    if (
+      status &&
+      ["draft", "ready"].includes(status)
+    ) {
+      const updateFields: Record<string, unknown> = {
+        status,
+        updated_at: new Date().toISOString(),
+      };
+      if (selectedModels) updateFields.selected_models = selectedModels;
+      if (estimatedCost !== undefined)
+        updateFields.estimated_cost = estimatedCost;
+      if (estimatedRuns !== undefined)
+        updateFields.estimated_runs = estimatedRuns;
+
+      const { error: statusError } = await supabase
+        .from("benchmark_drafts")
+        .update(updateFields)
+        .eq("id", id);
+
+      if (statusError) throw statusError;
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     const message =
