@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 01-configure-benchmark
 source: 01-01-SUMMARY.md, 01-02-SUMMARY.md, 01-03-SUMMARY.md, 01-04-SUMMARY.md
 started: 2026-02-11T21:00:00Z
@@ -69,7 +69,17 @@ skipped: 0
   reason: "User reported: if I choose 1 image in phase 1, it doesn't limit me to uploading 1 image in phase 2 (I can upload as many as I want). Instead of 1 upload card, there should be as many cards as the user selected in phase 1 (Image 1, Image 2, Image 3, Image 4) with a drag to upload or click to upload zone. When the user uploads the image, it should collapse down to thumbnail (don't show it full size) and it should prompt for the JSON schema in the editor. If the user clicks the thumbnail, then show the full size image. When the user clicks Save on each image, it should collapse that card to clean up screen real estate for uploading the other images and JSON"
   severity: major
   test: 7
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "StepUpload uses a single shared dropzone with dynamic card creation capped at MAX_IMAGES=10, ignoring sampleCount from Step 1. ImageCard has no three-state lifecycle (empty/editing/saved) and no Save button. Newly uploaded images start fully expanded instead of showing thumbnail with JSON editor."
+  artifacts:
+    - path: "src/components/wizard/step-upload.tsx"
+      issue: "Single shared dropzone + dynamic cards instead of N pre-defined upload slots based on sampleCount"
+    - path: "src/components/wizard/image-uploader.tsx"
+      issue: "Uses MAX_IMAGES (10) as limit, never receives or respects sampleCount"
+    - path: "src/components/wizard/image-card.tsx"
+      issue: "Only two states (expanded/collapsed), needs three (empty/editing/saved) plus Save button and thumbnail-click-to-expand"
+  missing:
+    - "Restructure StepUpload to pre-initialize N empty slots based on sampleCount, each card has its own embedded dropzone"
+    - "Add three-state ImageCard lifecycle: empty (upload zone), editing (thumbnail + JSON editor + Save), saved (collapsed thumbnail row)"
+    - "Add Save button per card that validates JSON and collapses the card"
+    - "Thumbnail-click-to-expand for viewing full-size image"
+  debug_session: ".planning/debug/step2-upload-cards.md"
