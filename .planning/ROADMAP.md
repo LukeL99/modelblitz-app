@@ -48,12 +48,12 @@ Plans:
   3. System benchmarks selected models via OpenRouter, capturing JSON output, response time, token count, cost, and pass/fail per run
   4. JSON comparison uses canonicalization (key sort, number normalization, whitespace) with binary exact-match default and relaxed matching toggle
   5. System enforces per-model concurrency limits with adaptive backoff on rate limits and a hard ~$7 API cost ceiling per report
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
+- [ ] 02-01-PLAN.md -- Stripe payment infrastructure: checkout API, webhook handler, DB migration, admin client, processing page
+- [ ] 02-02-PLAN.md -- Benchmark engine utilities: JSON canonicalization/comparison, adaptive backoff, cost tracker, model runner
+- [ ] 02-03-PLAN.md -- Engine orchestration + email: concurrency-controlled benchmark loop, cost ceiling enforcement, report completion email
 
 ### Phase 3: Results and Report
 **Goal**: User sees real-time benchmark progress and receives a comprehensive, shareable report with ranked results, visualizations, error analysis, and export options
