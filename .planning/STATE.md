@@ -62,8 +62,8 @@ Recent decisions affecting current work:
 - [01-04]: Cost estimator uses 1500 input / 500 output tokens per vision call with 3x parallelism
 - [01-04]: Model recommendation filters by strategy tiers then scores by priority weighting (3x/2x/1x)
 - [01-04]: PATCH /api/drafts/[id] extended to support status updates for completion flow
-- [Phase 01]: ON CONFLICT DO UPDATE SET public=true for idempotent bucket creation ensuring public access
-- [Phase 01]: Folder ownership RLS via storage.foldername()[1] matching upload path pattern user.id/draftId/file
+- [01-05]: ON CONFLICT DO UPDATE SET public=true for idempotent bucket creation ensuring public access
+- [01-05]: Folder ownership RLS via storage.foldername()[1] matching upload path pattern user.id/draftId/file
 - [01-06]: Slot-to-image mapping via array index (images[slotIndex]) for direct slot-to-image correspondence
 - [01-06]: Saved state managed locally per ImageCard, initialized from jsonValid on mount for draft restoration
 - [01-06]: SlotDropzone kept in image-uploader.tsx with renamed export (same file, different component name)
