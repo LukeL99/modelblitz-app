@@ -62,3 +62,15 @@ export const MIN_JSON_LENGTH = 2;
 
 /** Maximum JSON output length per image (bytes) */
 export const MAX_JSON_LENGTH = 100_000;
+
+/** Hard cost ceiling -- abort benchmark if total API cost reaches this (USD) */
+export const HARD_COST_CEILING = 15.0;
+
+/** Internal cost buffer reserved for in-flight calls (USD) */
+export const INTERNAL_COST_BUFFER = 6.5;
+
+/** Maximum concurrent API calls per model */
+export const PER_MODEL_CONCURRENCY = 3;
+
+/** Maximum global concurrent API calls across all models */
+export const GLOBAL_CONCURRENCY = 10;

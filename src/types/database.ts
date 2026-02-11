@@ -38,6 +38,7 @@ export interface Report {
   draft_id: string | null;
   status: ReportStatus;
   share_token: string | null;
+  stripe_session_id: string | null;
   config_snapshot: Record<string, unknown>;
   image_paths: string[];
   extraction_prompt: string;
@@ -47,6 +48,34 @@ export interface Report {
   model_count: number | null;
   started_at: string | null;
   completed_at: string | null;
+  created_at: string;
+}
+
+export type BenchmarkRunStatus =
+  | "pending"
+  | "running"
+  | "complete"
+  | "failed"
+  | "skipped";
+
+export interface BenchmarkRun {
+  id: string;
+  report_id: string;
+  model_id: string;
+  image_index: number;
+  run_number: number;
+  output_json: Record<string, unknown> | null;
+  is_valid_json: boolean;
+  exact_match: boolean;
+  field_accuracy: number | null;
+  field_errors: Record<string, unknown>[];
+  response_time_ms: number | null;
+  input_tokens: number | null;
+  output_tokens: number | null;
+  actual_cost: number | null;
+  estimated_cost: number | null;
+  status: BenchmarkRunStatus;
+  error_message: string | null;
   created_at: string;
 }
 
@@ -78,6 +107,14 @@ export interface Database {
           share_token?: string;
         };
         Update: Partial<Omit<Report, "id" | "user_id" | "created_at">>;
+      };
+      benchmark_runs: {
+        Row: BenchmarkRun;
+        Insert: Omit<BenchmarkRun, "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<Omit<BenchmarkRun, "id" | "report_id" | "created_at">>;
       };
     };
     Views: Record<string, never>;

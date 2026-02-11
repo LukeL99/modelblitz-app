@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { MockIndicator } from "@/components/debug/mock-indicator";
 import "./globals.css";
 
 const inter = Inter({
@@ -30,6 +31,7 @@ export default function RootLayout({
         className={`${inter.variable} ${jetbrainsMono.variable} bg-void text-text-primary antialiased`}
       >
         <NuqsAdapter>{children}</NuqsAdapter>
+        <MockIndicator />
       </body>
     </html>
   );
