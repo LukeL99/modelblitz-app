@@ -12,7 +12,7 @@ ModelPick delivers a paid one-shot benchmarking report for vision model structur
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Configure Benchmark** - Auth, image upload, wizard -- everything before payment
+- [x] **Phase 1: Configure Benchmark** - Auth, image upload, wizard -- everything before payment
 - [ ] **Phase 2: Pay and Run** - Stripe payment triggers benchmark engine execution
 - [ ] **Phase 3: Results and Report** - Real-time progress, full report, sharing, export
 
@@ -35,8 +35,8 @@ Plans:
 - [x] 01-02-PLAN.md -- Auth UI + Dashboard: login/signup forms, social OAuth, callback routes, dashboard with empty state
 - [x] 01-03-PLAN.md -- Wizard Steps 1-2: wizard shell, config step (priorities/strategy/count), upload step (images + JSON editor)
 - [x] 01-04-PLAN.md -- Wizard Step 3 + Business Logic: schema inference, cost estimation, model recommendation, completion flow
-- [ ] 01-05-PLAN.md -- Gap closure: Add storage RLS policies for benchmark-images bucket (fixes upload blocker)
-- [ ] 01-06-PLAN.md -- Gap closure: Restructure Step 2 to slot-based N-card upload UX with three-state lifecycle
+- [x] 01-05-PLAN.md -- Gap closure: Add storage RLS policies for benchmark-images bucket (fixes upload blocker)
+- [x] 01-06-PLAN.md -- Gap closure: Restructure Step 2 to slot-based N-card upload UX with three-state lifecycle
 
 ### Phase 2: Pay and Run
 **Goal**: User can pay $14.99 via Stripe and the system executes benchmarks across up to 24 vision models with real-time cost control
@@ -79,7 +79,7 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Configure Benchmark | 4/6 | Gap closure pending | - |
+| 1. Configure Benchmark | 6/6 | ✓ Complete | 2026-02-11 |
 | 2. Pay and Run | 0/3 | Not started | - |
 | 3. Results and Report | 0/3 | Not started | - |
 
