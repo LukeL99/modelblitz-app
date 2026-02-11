@@ -13,7 +13,7 @@ ModelPick delivers a paid one-shot benchmarking report for vision model structur
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Configure Benchmark** - Auth, image upload, wizard -- everything before payment
-- [ ] **Phase 2: Pay and Run** - Stripe payment triggers benchmark engine execution
+- [x] **Phase 2: Pay and Run** - Stripe payment triggers benchmark engine execution
 - [ ] **Phase 3: Results and Report** - Real-time progress, full report, sharing, export
 
 ## Phase Details
@@ -51,9 +51,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md -- Stripe payment infrastructure: checkout API, webhook handler, DB migration, admin client, processing page
-- [ ] 02-02-PLAN.md -- Benchmark engine utilities: JSON canonicalization/comparison, adaptive backoff, cost tracker, model runner
-- [ ] 02-03-PLAN.md -- Engine orchestration + email: concurrency-controlled benchmark loop, cost ceiling enforcement, report completion email
+- [x] 02-01-PLAN.md -- Stripe payment infrastructure: checkout API, webhook handler, DB migration, admin client, processing page
+- [x] 02-02-PLAN.md -- Benchmark engine utilities: JSON canonicalization/comparison, adaptive backoff, cost tracker, model runner
+- [x] 02-03-PLAN.md -- Engine orchestration + email: concurrency-controlled benchmark loop, cost ceiling enforcement, report completion email
 
 ### Phase 3: Results and Report
 **Goal**: User sees real-time benchmark progress and receives a comprehensive, shareable report with ranked results, visualizations, error analysis, and export options
@@ -80,7 +80,7 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Configure Benchmark | 6/6 | ✓ Complete | 2026-02-11 |
-| 2. Pay and Run | 0/3 | Not started | - |
+| 2. Pay and Run | 3/3 | ✓ Complete | 2026-02-11 |
 | 3. Results and Report | 0/3 | Not started | - |
 
 ---
