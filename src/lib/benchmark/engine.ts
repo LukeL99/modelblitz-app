@@ -308,7 +308,7 @@ export async function runBenchmark(reportId: string): Promise<void> {
               .update({
                 status: "failed",
                 error_message: result.error,
-                response_time_ms: result.responseTimeMs,
+                response_time_ms: Math.round(result.responseTimeMs),
                 input_tokens: result.inputTokens,
                 output_tokens: result.outputTokens,
                 actual_cost: result.actualCost,
@@ -354,7 +354,7 @@ export async function runBenchmark(reportId: string): Promise<void> {
               exact_match: exactMatch,
               field_accuracy: fieldAccuracy,
               field_errors: fieldErrors,
-              response_time_ms: result.responseTimeMs,
+              response_time_ms: Math.round(result.responseTimeMs),
               input_tokens: result.inputTokens,
               output_tokens: result.outputTokens,
               actual_cost: result.actualCost,

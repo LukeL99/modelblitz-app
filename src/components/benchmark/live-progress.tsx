@@ -60,81 +60,90 @@ export function LiveProgress({
   // Track which run IDs we have already counted to avoid double-counting on UPDATE
   const [countedRunIds] = useState(() => new Set<string>());
 
-  // Subscribe to Realtime postgres_changes on benchmark_runs and reports
+  // Subscribe to Realtime postgres_changes on benchmark_runs and reports.
+  // Deferred via setTimeout to avoid React strict mode / HMR race condition
+  // where cleanup tears down the singleton client's WebSocket before the
+  // handshake completes, causing "WebSocket closed before established".
   useEffect(() => {
     const supabase = createClient();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    const channel = supabase
-      .channel(`benchmark-progress-${reportId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "benchmark_runs",
-          filter: `report_id=eq.${reportId}`,
-        },
-        (payload) => {
-          const run = payload.new as BenchmarkRun;
-          if (!run || !run.model_id) return;
+    const timer = setTimeout(() => {
+      channel = supabase
+        .channel(`benchmark-progress-${reportId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "benchmark_runs",
+            filter: `report_id=eq.${reportId}`,
+          },
+          (payload) => {
+            const run = payload.new as BenchmarkRun;
+            if (!run || !run.model_id) return;
 
-          const runStatus = run.status as BenchmarkRunStatus;
-          const isTerminal =
-            runStatus === "complete" ||
-            runStatus === "failed" ||
-            runStatus === "skipped";
+            const runStatus = run.status as BenchmarkRunStatus;
+            const isTerminal =
+              runStatus === "complete" ||
+              runStatus === "failed" ||
+              runStatus === "skipped";
 
-          setProgress((prev) => {
-            const next = new Map(prev);
-            const existing = next.get(run.model_id);
-            if (!existing) return prev;
+            setProgress((prev) => {
+              const next = new Map(prev);
+              const existing = next.get(run.model_id);
+              if (!existing) return prev;
 
-            // Only count a run once -- track by run ID
-            if (isTerminal && !countedRunIds.has(run.id)) {
-              countedRunIds.add(run.id);
-              const newCompleted = existing.completed + 1;
-              const newStatus: ModelProgress["status"] =
-                newCompleted >= existing.total ? "complete" : "running";
+              // Only count a run once -- track by run ID
+              if (isTerminal && !countedRunIds.has(run.id)) {
+                countedRunIds.add(run.id);
+                const newCompleted = existing.completed + 1;
+                const newStatus: ModelProgress["status"] =
+                  newCompleted >= existing.total ? "complete" : "running";
 
-              next.set(run.model_id, {
-                ...existing,
-                completed: newCompleted,
-                status: newStatus,
-              });
-            } else if (runStatus === "running" && existing.status === "pending") {
-              next.set(run.model_id, {
-                ...existing,
-                status: "running",
-              });
-            }
+                next.set(run.model_id, {
+                  ...existing,
+                  completed: newCompleted,
+                  status: newStatus,
+                });
+              } else if (runStatus === "running" && existing.status === "pending") {
+                next.set(run.model_id, {
+                  ...existing,
+                  status: "running",
+                });
+              }
 
-            return next;
-          });
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "reports",
-          filter: `id=eq.${reportId}`,
-        },
-        (payload) => {
-          const report = payload.new as { status?: string };
-          if (report.status === "complete") {
-            setReportComplete(true);
-          } else if (report.status === "failed") {
-            setReportFailed(true);
+              return next;
+            });
           }
-        }
-      )
-      .subscribe((status) => {
-        setConnected(status === "SUBSCRIBED");
-      });
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "reports",
+            filter: `id=eq.${reportId}`,
+          },
+          (payload) => {
+            const report = payload.new as { status?: string };
+            if (report.status === "complete") {
+              setReportComplete(true);
+            } else if (report.status === "failed") {
+              setReportFailed(true);
+            }
+          }
+        )
+        .subscribe((status) => {
+          setConnected(status === "SUBSCRIBED");
+        });
+    }, 0);
 
     return () => {
-      supabase.removeChannel(channel);
+      clearTimeout(timer);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, [reportId, countedRunIds]);
 
