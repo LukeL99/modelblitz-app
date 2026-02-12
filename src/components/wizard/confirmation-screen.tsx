@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, CreditCard, Layers, ImageIcon, Zap, ListOrdered } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { REPORT_PRICE } from "@/lib/config/constants";
-import { getClientActiveMocks } from "@/lib/debug/mock-config";
+import { useMocks } from "@/lib/debug/mock-provider";
 
 interface ConfirmationScreenProps {
   draftId: string;
@@ -28,7 +28,8 @@ export function ConfirmationScreen({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isMock = getClientActiveMocks().includes("stripe");
+  const mocks = useMocks();
+  const isMock = mocks.includes("stripe");
 
   async function handleCheckout() {
     setLoading(true);

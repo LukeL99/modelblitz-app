@@ -1,6 +1,6 @@
 "use client";
 
-import { getClientActiveMocks } from "@/lib/debug/mock-config";
+import { useMocks } from "@/lib/debug/mock-provider";
 
 /**
  * Debug mock indicator badge.
@@ -8,7 +8,7 @@ import { getClientActiveMocks } from "@/lib/debug/mock-config";
  * Renders nothing when no mocks are active.
  */
 export function MockIndicator() {
-  const mocks = getClientActiveMocks();
+  const mocks = useMocks();
 
   if (mocks.length === 0) return null;
 

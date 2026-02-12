@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { getActiveMocks } from "@/lib/debug/mock-config";
+import { MockProvider } from "@/lib/debug/mock-provider";
 import { MockIndicator } from "@/components/debug/mock-indicator";
 import "./globals.css";
 
@@ -30,8 +32,10 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} bg-void text-text-primary antialiased`}
       >
-        <NuqsAdapter>{children}</NuqsAdapter>
-        <MockIndicator />
+        <MockProvider mocks={getActiveMocks()}>
+          <NuqsAdapter>{children}</NuqsAdapter>
+          <MockIndicator />
+        </MockProvider>
       </body>
     </html>
   );

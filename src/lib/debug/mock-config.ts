@@ -27,13 +27,3 @@ export function getActiveMocks(): string[] {
   return mocks;
 }
 
-/**
- * Client-side mock detection.
- * Reads NEXT_PUBLIC_DEBUG_MOCKS which is a comma-separated list
- * set at build time (e.g., "stripe,openrouter").
- */
-export function getClientActiveMocks(): string[] {
-  const raw = process.env.NEXT_PUBLIC_DEBUG_MOCKS ?? "";
-  if (!raw.trim()) return [];
-  return raw.split(",").map((s) => s.trim()).filter(Boolean);
-}
