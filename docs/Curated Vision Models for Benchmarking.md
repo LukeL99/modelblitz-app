@@ -17,6 +17,16 @@ Selection based on cross-referencing multiple sources:
 7. **Community reports (Reddit r/LocalLLaMA, r/Bard)** — Gemini 2.0 Flash achieving 98-99% on specific OCR tasks; Gemini 3 Flash scoring 100% on internal OCR benchmarks; Llama 4 Maverick reaching 95% accuracy.
 8. **Mistral OCR 3 (Dec 2025)** — SOTA document parsing, double-digit accuracy lead over Azure AI and AWS Textract on handwriting/tables. (Note: Mistral OCR is a dedicated OCR API, not a general VLM on OpenRouter.)
 
+### Structured Output (SO) Column Legend
+
+> Verified via OpenRouter API `supported_parameters` field on 2026-02-11.
+
+- **✅** = Full structured output (`response_format: { type: "json_schema" }`) — API enforces the JSON schema on the response, model CANNOT return malformed JSON
+- **⚠️** = Partial support — either JSON mode only (valid JSON but no schema enforcement), or tool_use workaround only (no native `structured_outputs` parameter on OpenRouter)
+- **❌** = No structured output support on OpenRouter (no `structured_outputs` or `response_format` parameter)
+
+**Key insight:** 20 of 24 models support full structured output (✅). The main gaps are free-tier models (Gemma 3 12B, Nemotron Nano 12B) and older Anthropic models (Claude Sonnet 4, Opus 4) which predate Anthropic's structured output feature (Nov 2025). Sonnet 4 and Opus 4 still support `tools` which can be used as a workaround for schema-enforced extraction.
+
 ### Key Findings
 - **Gemini family dominates OCR/document extraction** — 2.0 Flash, 2.5 Pro, 3 Flash, and 3 Pro are all top-tier
 - **Qwen VL models are the best open-source option** — Qwen 2.5 VL 72B matches GPT-4o; Qwen3 VL improves further
@@ -29,12 +39,12 @@ Selection based on cross-referencing multiple sources:
 
 ## Free Tier
 
-| Model | Provider | Input $/1M | Output $/1M | PDF | Why Selected | OCR Notes |
-|-------|----------|-----------|------------|-----|--------------|-----------|
-| Mistral: Mistral Small 3.1 24B (free) | mistralai | Free | Free | ❌ | Best free vision model; Mistral's vision capabilities are solid for the size | Decent OCR for a free model; won't match paid tiers but good baseline |
-| Google: Gemma 3 27B (free) | google | Free | Free | ❌ | Largest free model; important to test as "free ceiling" | ⚠️ **Surprisingly poor at OCR (42.9% on Omni benchmark)** despite Gemini-derived architecture. Must-test to confirm |
-| NVIDIA: Nemotron Nano 12B 2 VL (free) | nvidia | Free | Free | ❌ | NVIDIA's entry; test as potential dark horse | Limited OCR benchmarks available; worth testing as free alternative |
-| Google: Gemma 3 12B (free) | google | Free | Free | ❌ | Mid-size free option for size vs accuracy comparison | Likely weaker than 27B; baseline comparison |
+| Model | Provider | Input $/1M | Output $/1M | PDF | SO | Why Selected | OCR Notes |
+|-------|----------|-----------|------------|-----|-----|--------------|-----------|
+| Mistral: Mistral Small 3.1 24B (free) | mistralai | Free | Free | ❌ | ✅ | Best free vision model; Mistral's vision capabilities are solid for the size | Decent OCR for a free model; won't match paid tiers but good baseline |
+| Google: Gemma 3 27B (free) | google | Free | Free | ❌ | ⚠️ | Largest free model; important to test as "free ceiling" | ⚠️ **Surprisingly poor at OCR (42.9% on Omni benchmark)** despite Gemini-derived architecture. Must-test to confirm |
+| NVIDIA: Nemotron Nano 12B 2 VL (free) | nvidia | Free | Free | ❌ | ❌ | NVIDIA's entry; test as potential dark horse | Limited OCR benchmarks available; worth testing as free alternative |
+| Google: Gemma 3 12B (free) | google | Free | Free | ❌ | ❌ | Mid-size free option for size vs accuracy comparison | Likely weaker than 27B; baseline comparison |
 
 > **Free tier caveat:** No free models support PDF input. All are image-only. Expect significantly lower accuracy than paid models. These are mostly useful as "free baseline" comparisons.
 
@@ -42,16 +52,16 @@ Selection based on cross-referencing multiple sources:
 
 ## Budget Tier (under $0.50/1M input)
 
-| Model | Provider | Input $/1M | Output $/1M | PDF | Why Selected | OCR Notes |
-|-------|----------|-----------|------------|-----|--------------|-----------|
-| Google: Gemini 2.0 Flash | google | $0.10 | $0.40 | ✅ | **Community reports 98-99% OCR accuracy** — may be best value in entire list | Users report it outperforms even Gemini 2.5 Pro on some OCR tasks. Incredible price/performance |
-| Google: Gemini 2.5 Flash | google | $0.30 | $2.50 | ✅ | Top flash-tier model with massive 1M context. Strong OCR inheriting from Gemini family | Excellent for high-volume document processing. PDF support is huge |
-| OpenAI: GPT-5 Nano | openai | $0.05 | $0.40 | ✅ | Cheapest GPT-5 variant with PDF support. Test GPT-5 OCR at rock-bottom price | Likely good enough for clean documents; may struggle with low-quality scans |
-| OpenAI: GPT-5 Mini | openai | $0.25 | $2.00 | ✅ | Sweet spot of GPT-5 family — near-top accuracy at budget price | GPT-5 Mini benchmarks near GPT-5 full on many vision tasks |
-| Qwen: Qwen2.5 VL 72B Instruct | qwen | $0.15 | $0.60 | ❌ | **#1 open-source OCR model** — 75% on Omni benchmark, matching GPT-4o | Optimized for structured vision-language tasks, document parsing, OCR. 96.4% on DocVQA |
-| Meta: Llama 4 Maverick | meta-llama | $0.15 | $0.60 | ❌ | **Overtook Qwen as top open-source OCR** — up to 95% accuracy reported | 🏇 Dark horse that became the horse. Huge step up from Llama 3.2 for OCR |
-| Qwen: Qwen3 VL 235B A22B Instruct | qwen | $0.20 | $0.88 | ❌ | Latest Qwen VL — should exceed Qwen 2.5 VL benchmarks | 97% on DocVQA for Qwen3 family; MoE architecture keeps cost low |
-| OpenAI: GPT-4.1 Nano | openai | $0.10 | $0.40 | ✅ | Proven GPT-4.1 architecture at nano price with PDF support | Good structured output adherence; solid baseline |
+| Model | Provider | Input $/1M | Output $/1M | PDF | SO | Why Selected | OCR Notes |
+|-------|----------|-----------|------------|-----|-----|--------------|-----------|
+| Google: Gemini 2.0 Flash | google | $0.10 | $0.40 | ✅ | ✅ | **Community reports 98-99% OCR accuracy** — may be best value in entire list | Users report it outperforms even Gemini 2.5 Pro on some OCR tasks. Incredible price/performance |
+| Google: Gemini 2.5 Flash | google | $0.30 | $2.50 | ✅ | ✅ | Top flash-tier model with massive 1M context. Strong OCR inheriting from Gemini family | Excellent for high-volume document processing. PDF support is huge |
+| OpenAI: GPT-5 Nano | openai | $0.05 | $0.40 | ✅ | ✅ | Cheapest GPT-5 variant with PDF support. Test GPT-5 OCR at rock-bottom price | Likely good enough for clean documents; may struggle with low-quality scans |
+| OpenAI: GPT-5 Mini | openai | $0.25 | $2.00 | ✅ | ✅ | Sweet spot of GPT-5 family — near-top accuracy at budget price | GPT-5 Mini benchmarks near GPT-5 full on many vision tasks |
+| Qwen: Qwen2.5 VL 72B Instruct | qwen | $0.15 | $0.60 | ❌ | ✅ | **#1 open-source OCR model** — 75% on Omni benchmark, matching GPT-4o | Optimized for structured vision-language tasks, document parsing, OCR. 96.4% on DocVQA |
+| Meta: Llama 4 Maverick | meta-llama | $0.15 | $0.60 | ❌ | ✅ | **Overtook Qwen as top open-source OCR** — up to 95% accuracy reported | 🏇 Dark horse that became the horse. Huge step up from Llama 3.2 for OCR |
+| Qwen: Qwen3 VL 235B A22B Instruct | qwen | $0.20 | $0.88 | ❌ | ✅ | Latest Qwen VL — should exceed Qwen 2.5 VL benchmarks | 97% on DocVQA for Qwen3 family; MoE architecture keeps cost low |
+| OpenAI: GPT-4.1 Nano | openai | $0.10 | $0.40 | ✅ | ✅ | Proven GPT-4.1 architecture at nano price with PDF support | Good structured output adherence; solid baseline |
 
 > **Budget tier star:** Gemini 2.0 Flash at $0.10 input is absurdly good value for OCR. Qwen 2.5 VL 72B and Llama 4 Maverick are best open-source options.
 
@@ -59,14 +69,14 @@ Selection based on cross-referencing multiple sources:
 
 ## Mid Tier ($0.50 - $2.99/1M input)
 
-| Model | Provider | Input $/1M | Output $/1M | PDF | Why Selected | OCR Notes |
-|-------|----------|-----------|------------|-----|--------------|-----------|
-| Google: Gemini 3 Flash Preview | google | $0.50 | $3.00 | ✅ | **100% on internal OCR benchmarks (community)**, outperforms Gemini 3 Pro on OCR | Flash models tend to hallucinate less on OCR than Pro models. Outstanding |
-| Google: Gemini 2.5 Pro | google | $1.25 | $10.00 | ✅ | **#1 on Fraunhofer invoice benchmark** (87-97% across datasets). OmniDocBench 69.6% | The proven workhorse for document extraction. Massive 1M context for multi-page docs |
-| Google: Gemini 3 Pro Preview | google | $2.00 | $12.00 | ✅ | **#1 on OmniDocBench 1.5 (81.4%)** — best overall OCR edit distance | Spatial reasoning beyond simple OCR. May hallucinate slightly more than Flash on OCR |
-| OpenAI: GPT-5 | openai | $1.25 | $10.00 | ✅ | **Tied #1 on Vision Checkup** with o4 Mini. Strong document understanding | Reasoning capabilities help with complex layouts. PDF native support |
-| OpenAI: GPT-5.1 | openai | $1.25 | $10.00 | ✅ | Latest GPT-5 series iteration with improvements over base GPT-5 | OmniDocBench 69.5%. Strong all-around but Gemini edges it on pure OCR |
-| Anthropic: Claude Haiku 4.5 | anthropic | $1.00 | $5.00 | ❌ | **Best JSON format consistency** — valid JSON 100% of the time | Great when you need reliable structured output. OCR accuracy slightly below Gemini/GPT |
+| Model | Provider | Input $/1M | Output $/1M | PDF | SO | Why Selected | OCR Notes |
+|-------|----------|-----------|------------|-----|-----|--------------|-----------|
+| Google: Gemini 3 Flash Preview | google | $0.50 | $3.00 | ✅ | ✅ | **100% on internal OCR benchmarks (community)**, outperforms Gemini 3 Pro on OCR | Flash models tend to hallucinate less on OCR than Pro models. Outstanding |
+| Google: Gemini 2.5 Pro | google | $1.25 | $10.00 | ✅ | ✅ | **#1 on Fraunhofer invoice benchmark** (87-97% across datasets). OmniDocBench 69.6% | The proven workhorse for document extraction. Massive 1M context for multi-page docs |
+| Google: Gemini 3 Pro Preview | google | $2.00 | $12.00 | ✅ | ✅ | **#1 on OmniDocBench 1.5 (81.4%)** — best overall OCR edit distance | Spatial reasoning beyond simple OCR. May hallucinate slightly more than Flash on OCR |
+| OpenAI: GPT-5 | openai | $1.25 | $10.00 | ✅ | ✅ | **Tied #1 on Vision Checkup** with o4 Mini. Strong document understanding | Reasoning capabilities help with complex layouts. PDF native support |
+| OpenAI: GPT-5.1 | openai | $1.25 | $10.00 | ✅ | ✅ | Latest GPT-5 series iteration with improvements over base GPT-5 | OmniDocBench 69.5%. Strong all-around but Gemini edges it on pure OCR |
+| Anthropic: Claude Haiku 4.5 | anthropic | $1.00 | $5.00 | ❌ | ✅ | **Best JSON format consistency** — valid JSON 100% of the time | Great when you need reliable structured output. OCR accuracy slightly below Gemini/GPT |
 
 > **Mid tier insight:** Gemini 3 Flash at $0.50 may be the best model on this entire list for OCR. Gemini 2.5 Pro is the proven enterprise choice. GPT-5/5.1 are strong alternatives.
 
@@ -74,12 +84,12 @@ Selection based on cross-referencing multiple sources:
 
 ## Premium Tier ($3.00 - $9.99/1M input)
 
-| Model | Provider | Input $/1M | Output $/1M | PDF | Why Selected | OCR Notes |
-|-------|----------|-----------|------------|-----|--------------|-----------|
-| Anthropic: Claude Sonnet 4.5 | anthropic | $3.00 | $15.00 | ✅ | **Tied for highest OCR score (AIMultiple)** with Gemini 2.5 Pro. Best structured output | Excellent balance of OCR accuracy + JSON reliability. PDF support. 1M context |
-| Anthropic: Claude Sonnet 4 | anthropic | $3.00 | $15.00 | ✅ | Strong baseline; test if 4.5 improvements matter for OCR specifically | Some reports suggest Sonnet 4 "isn't great for document understanding" vs expectations |
-| xAI: Grok 4 | x-ai | $3.00 | $15.00 | ❌ | Strong general reasoning; test as xAI's best vision offering | Limited OCR-specific benchmarks; 100% on τ²-bench Telecom tool-calling. Worth testing |
-| Anthropic: Claude Opus 4.6 | anthropic | $5.00 | $25.00 | ❌ | Latest Opus — maximum Anthropic capability | Test if Opus-tier reasoning helps with complex/messy documents |
+| Model | Provider | Input $/1M | Output $/1M | PDF | SO | Why Selected | OCR Notes |
+|-------|----------|-----------|------------|-----|-----|--------------|-----------|
+| Anthropic: Claude Sonnet 4.5 | anthropic | $3.00 | $15.00 | ✅ | ✅ | **Tied for highest OCR score (AIMultiple)** with Gemini 2.5 Pro. Best structured output | Excellent balance of OCR accuracy + JSON reliability. PDF support. 1M context |
+| Anthropic: Claude Sonnet 4 | anthropic | $3.00 | $15.00 | ✅ | ⚠️ | Strong baseline; test if 4.5 improvements matter for OCR specifically | Some reports suggest Sonnet 4 "isn't great for document understanding" vs expectations |
+| xAI: Grok 4 | x-ai | $3.00 | $15.00 | ❌ | ✅ | Strong general reasoning; test as xAI's best vision offering | Limited OCR-specific benchmarks; 100% on τ²-bench Telecom tool-calling. Worth testing |
+| Anthropic: Claude Opus 4.6 | anthropic | $5.00 | $25.00 | ❌ | ✅ | Latest Opus — maximum Anthropic capability | Test if Opus-tier reasoning helps with complex/messy documents |
 
 > **Premium caveat:** At this price tier, Gemini 3 Pro ($2.00) in the Mid tier likely outperforms most Premium models on pure OCR. Premium models shine when you need combined reasoning + extraction.
 
@@ -87,10 +97,10 @@ Selection based on cross-referencing multiple sources:
 
 ## Ultra Tier ($10+/1M input)
 
-| Model | Provider | Input $/1M | Output $/1M | PDF | Why Selected | OCR Notes |
-|-------|----------|-----------|------------|-----|--------------|-----------|
-| OpenAI: GPT-5 Pro | openai | $15.00 | $120.00 | ✅ | Maximum GPT capability. Test if Pro-tier reasoning helps OCR | Likely diminishing returns for OCR vs GPT-5 at 12x the price |
-| Anthropic: Claude Opus 4 | anthropic | $15.00 | $75.00 | ✅ | Flagship Opus with PDF support | Test as "money is no object" ceiling |
+| Model | Provider | Input $/1M | Output $/1M | PDF | SO | Why Selected | OCR Notes |
+|-------|----------|-----------|------------|-----|-----|--------------|-----------|
+| OpenAI: GPT-5 Pro | openai | $15.00 | $120.00 | ✅ | ✅ | Maximum GPT capability. Test if Pro-tier reasoning helps OCR | Likely diminishing returns for OCR vs GPT-5 at 12x the price |
+| Anthropic: Claude Opus 4 | anthropic | $15.00 | $75.00 | ✅ | ⚠️ | Flagship Opus with PDF support | Test as "money is no object" ceiling |
 
 > **Ultra caveat:** For pure OCR/extraction, Ultra models are almost certainly not worth the price premium. Include 1-2 as ceiling benchmarks only.
 
@@ -101,40 +111,40 @@ Selection based on cross-referencing multiple sources:
 ### By Priority
 
 **Must-test (12 models — these will likely define the Pareto frontier):**
-| # | Model | Tier | Input $/1M | PDF | Rationale |
-|---|-------|------|-----------|-----|-----------|
-| 1 | Gemini 2.0 Flash | Budget | $0.10 | ✅ | Best value; 98-99% OCR reported |
-| 2 | Gemini 3 Flash Preview | Mid | $0.50 | ✅ | Potentially best OCR model period |
-| 3 | Gemini 2.5 Pro | Mid | $1.25 | ✅ | Proven #1 on Fraunhofer invoice benchmark |
-| 4 | Gemini 3 Pro Preview | Mid | $2.00 | ✅ | #1 OmniDocBench; best spatial reasoning |
-| 5 | GPT-5 Nano | Budget | $0.05 | ✅ | Cheapest PDF-capable model worth testing |
-| 6 | GPT-5 Mini | Budget | $0.25 | ✅ | GPT-5 quality at budget price |
-| 7 | GPT-5 | Mid | $1.25 | ✅ | Full GPT-5 capability benchmark |
-| 8 | Claude Sonnet 4.5 | Premium | $3.00 | ✅ | Best structured output; tied top OCR |
-| 9 | Qwen 2.5 VL 72B | Budget | $0.15 | ❌ | Best open-source OCR baseline |
-| 10 | Llama 4 Maverick | Budget | $0.15 | ❌ | Top open-source OCR, 95% accuracy |
-| 11 | Qwen3 VL 235B A22B Instruct | Budget | $0.20 | ❌ | Latest Qwen VL; should beat 2.5 |
-| 12 | Claude Haiku 4.5 | Mid | $1.00 | ❌ | Cheap Anthropic option; JSON reliability |
+| # | Model | Tier | Input $/1M | PDF | SO | Rationale |
+|---|-------|------|-----------|-----|-----|-----------|
+| 1 | Gemini 2.0 Flash | Budget | $0.10 | ✅ | ✅ | Best value; 98-99% OCR reported |
+| 2 | Gemini 3 Flash Preview | Mid | $0.50 | ✅ | ✅ | Potentially best OCR model period |
+| 3 | Gemini 2.5 Pro | Mid | $1.25 | ✅ | ✅ | Proven #1 on Fraunhofer invoice benchmark |
+| 4 | Gemini 3 Pro Preview | Mid | $2.00 | ✅ | ✅ | #1 OmniDocBench; best spatial reasoning |
+| 5 | GPT-5 Nano | Budget | $0.05 | ✅ | ✅ | Cheapest PDF-capable model worth testing |
+| 6 | GPT-5 Mini | Budget | $0.25 | ✅ | ✅ | GPT-5 quality at budget price |
+| 7 | GPT-5 | Mid | $1.25 | ✅ | ✅ | Full GPT-5 capability benchmark |
+| 8 | Claude Sonnet 4.5 | Premium | $3.00 | ✅ | ✅ | Best structured output; tied top OCR |
+| 9 | Qwen 2.5 VL 72B | Budget | $0.15 | ❌ | ✅ | Best open-source OCR baseline |
+| 10 | Llama 4 Maverick | Budget | $0.15 | ❌ | ✅ | Top open-source OCR, 95% accuracy |
+| 11 | Qwen3 VL 235B A22B Instruct | Budget | $0.20 | ❌ | ✅ | Latest Qwen VL; should beat 2.5 |
+| 12 | Claude Haiku 4.5 | Mid | $1.00 | ❌ | ✅ | Cheap Anthropic option; JSON reliability |
 
 **Should-test (8 models — fill out tiers and comparisons):**
-| # | Model | Tier | Input $/1M | PDF | Rationale |
-|---|-------|------|-----------|-----|-----------|
-| 13 | GPT-4.1 Nano | Budget | $0.10 | ✅ | Proven architecture, cheap |
-| 14 | Gemini 2.5 Flash | Budget | $0.30 | ✅ | Compare vs 2.0 Flash and 3 Flash |
-| 15 | GPT-5.1 | Mid | $1.25 | ✅ | Compare vs base GPT-5 |
-| 16 | Claude Sonnet 4 | Premium | $3.00 | ✅ | Compare vs 4.5 |
-| 17 | Mistral Small 3.1 24B (free) | Free | Free | ❌ | Best free baseline |
-| 18 | Gemma 3 27B (free) | Free | Free | ❌ | Test known-weak model as floor |
-| 19 | Grok 4 | Premium | $3.00 | ❌ | xAI comparison point |
-| 20 | GPT-4.1 Mini | Budget | $0.40 | ✅ | Proven mid-range with PDF |
+| # | Model | Tier | Input $/1M | PDF | SO | Rationale |
+|---|-------|------|-----------|-----|-----|-----------|
+| 13 | GPT-4.1 Nano | Budget | $0.10 | ✅ | ✅ | Proven architecture, cheap |
+| 14 | Gemini 2.5 Flash | Budget | $0.30 | ✅ | ✅ | Compare vs 2.0 Flash and 3 Flash |
+| 15 | GPT-5.1 | Mid | $1.25 | ✅ | ✅ | Compare vs base GPT-5 |
+| 16 | Claude Sonnet 4 | Premium | $3.00 | ✅ | ⚠️ | Compare vs 4.5 |
+| 17 | Mistral Small 3.1 24B (free) | Free | Free | ❌ | ✅ | Best free baseline |
+| 18 | Gemma 3 27B (free) | Free | Free | ❌ | ⚠️ | Test known-weak model as floor |
+| 19 | Grok 4 | Premium | $3.00 | ❌ | ✅ | xAI comparison point |
+| 20 | GPT-4.1 Mini | Budget | $0.40 | ✅ | ✅ | Proven mid-range with PDF |
 
 **Nice-to-have (4 models — for completeness):**
-| # | Model | Tier | Input $/1M | PDF | Rationale |
-|---|-------|------|-----------|-----|-----------|
-| 21 | GPT-5 Pro | Ultra | $15.00 | ✅ | Ultra ceiling test |
-| 22 | Claude Opus 4 | Ultra | $15.00 | ✅ | Ultra ceiling test |
-| 23 | Qwen3 VL 8B Instruct | Budget | $0.08 | ❌ | Tiny model stress test |
-| 24 | NVIDIA Nemotron Nano 12B (free) | Free | Free | ❌ | Free dark horse |
+| # | Model | Tier | Input $/1M | PDF | SO | Rationale |
+|---|-------|------|-----------|-----|-----|-----------|
+| 21 | GPT-5 Pro | Ultra | $15.00 | ✅ | ✅ | Ultra ceiling test |
+| 22 | Claude Opus 4 | Ultra | $15.00 | ✅ | ⚠️ | Ultra ceiling test |
+| 23 | Qwen3 VL 8B Instruct | Budget | $0.08 | ❌ | ✅ | Tiny model stress test |
+| 24 | NVIDIA Nemotron Nano 12B (free) | Free | Free | ❌ | ❌ | Free dark horse |
 
 ---
 
@@ -179,6 +189,10 @@ Models with native PDF/file input (important for document extraction without pre
 7. **Mistral OCR ≠ Mistral Small/Medium** — Mistral's dedicated OCR API is excellent but is a different product from their general VLMs on OpenRouter. The general VLMs (Small 3.1, Medium 3) are decent but not OCR-specialized.
 
 8. **Context window matters for multi-page** — Gemini (1M tokens) and GPT-5 (400K) can handle very long documents. Qwen models have shorter contexts (16K-32K for some variants).
+
+9. **Claude Sonnet 4 & Opus 4 lack native structured output on OpenRouter** — These models predate Anthropic's structured output feature (Nov 2025). They support `tools` (which can enforce schema via tool_use trick), but not `response_format: { type: "json_schema" }`. The newer Claude models (Sonnet 4.5, Haiku 4.5, Opus 4.6) all have full structured output support.
+
+10. **Free-tier models have reduced OpenRouter features** — Even models that support structured output in their paid variant (e.g., Gemma 3 27B) may lose that support in the `:free` variant on OpenRouter. The free Gemma 3 27B has `response_format` (JSON mode) but not `structured_outputs` (schema enforcement).
 
 ---
 
