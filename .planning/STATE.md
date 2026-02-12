@@ -89,6 +89,12 @@ Recent decisions affecting current work:
 
 - Next.js 16 warns middleware is deprecated in favor of "proxy" -- informational only, middleware still works.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Rebrand modelpick to modelblitz (domain: modelblitz.com) | 2026-02-12 | bcf9fb2 | [1-rebrand-modelpick-to-modelblitz-domain-m](./quick/1-rebrand-modelpick-to-modelblitz-domain-m/) |
+
 ## Session Continuity
 
 Last session: 2026-02-12
