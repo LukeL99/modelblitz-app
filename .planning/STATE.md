@@ -78,6 +78,9 @@ Recent decisions affecting current work:
 - [02-03]: Nested concurrency control: global pLimit(10) wrapping per-model pLimit(3) for rate limit protection
 - [02-03]: Dynamic import for email module to keep engine loosely coupled from email infrastructure
 - [02-03]: Email sender uses RESEND_FROM_EMAIL env var with fallback to Resend onboarding sender for development
+- [02-04]: setSavedSchemaData called BEFORE saveDraftStep for immediate state sync even if network is slow
+- [02-04]: handleComplete conditionally includes step/data for edge case safety when savedSchemaData is null
+- [02-04]: Removed intermediate success page entirely rather than hiding it, keeping StepSchema visible during API call
 - [02-05]: MockProvider as separate "use client" file to keep mock-config.ts server-only
 
 ### Pending Todos
@@ -99,5 +102,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed 02-05 (MockProvider context replacing NEXT_PUBLIC_DEBUG_MOCKS)
-Resume file: .planning/phases/02-pay-and-run/02-05-SUMMARY.md
+Stopped at: Completed 02-04 (Wizard data flow fix - savedSchemaData sync)
+Resume file: .planning/phases/02-pay-and-run/02-04-SUMMARY.md
