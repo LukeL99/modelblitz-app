@@ -139,23 +139,12 @@ export function StepUpload({
     [draftId, onImagesChange, showError]
   );
 
-  const handleJsonChange = useCallback(
-    (imageId: string, value: string) => {
-      onImagesChange(
-        images.map((img) =>
-          img.id === imageId ? { ...img, expectedJson: value } : img
-        )
-      );
-    },
-    [images, onImagesChange]
-  );
-
-  const handleValidChange = useCallback(
-    (imageId: string, isValid: boolean, parsed: unknown) => {
+  const handleJsonUpdate = useCallback(
+    (imageId: string, value: string, isValid: boolean, parsed: unknown) => {
       onImagesChange(
         images.map((img) =>
           img.id === imageId
-            ? { ...img, jsonValid: isValid, parsedJson: parsed }
+            ? { ...img, expectedJson: value, jsonValid: isValid, parsedJson: parsed }
             : img
         )
       );
@@ -229,11 +218,8 @@ export function StepUpload({
               image={image}
               uploading={isUploading}
               onFileAccepted={(file: File) => handleFileForSlot(slotIndex, file)}
-              onJsonChange={(value) => {
-                if (image) handleJsonChange(image.id, value);
-              }}
-              onValidChange={(isValid, parsed) => {
-                if (image) handleValidChange(image.id, isValid, parsed);
+              onJsonUpdate={(value, isValid, parsed) => {
+                if (image) handleJsonUpdate(image.id, value, isValid, parsed);
               }}
               onRemove={() => handleRemove(slotIndex)}
               onError={showError}

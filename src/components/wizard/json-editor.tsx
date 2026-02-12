@@ -48,33 +48,31 @@ function jsonLinter() {
 
 interface JsonEditorProps {
   value: string;
-  onChange: (value: string) => void;
-  onValidChange?: (isValid: boolean, parsed: unknown) => void;
+  onChange: (value: string, isValid: boolean, parsed: unknown) => void;
 }
 
-export function JsonEditor({ value, onChange, onValidChange }: JsonEditorProps) {
+export function JsonEditor({ value, onChange }: JsonEditorProps) {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = useCallback(
     (val: string) => {
-      onChange(val);
       if (!val.trim()) {
         setError(null);
-        onValidChange?.(false, null);
+        onChange(val, false, null);
         return;
       }
       try {
         const parsed = JSON.parse(val);
         setError(null);
-        onValidChange?.(true, parsed);
+        onChange(val, true, parsed);
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Invalid JSON";
         setError(msg);
-        onValidChange?.(false, null);
+        onChange(val, false, null);
       }
     },
-    [onChange, onValidChange]
+    [onChange]
   );
 
   const handleFileUpload = useCallback(

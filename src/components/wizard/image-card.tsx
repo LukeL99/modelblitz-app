@@ -11,8 +11,7 @@ interface ImageCardProps {
   image: ImageEntry | null;
   uploading?: boolean;
   onFileAccepted: (file: File) => void;
-  onJsonChange: (value: string) => void;
-  onValidChange: (isValid: boolean, parsed: unknown) => void;
+  onJsonUpdate: (value: string, isValid: boolean, parsed: unknown) => void;
   onRemove: () => void;
   onError: (message: string) => void;
 }
@@ -53,8 +52,7 @@ export function ImageCard({
   image,
   uploading = false,
   onFileAccepted,
-  onJsonChange,
-  onValidChange,
+  onJsonUpdate,
   onRemove,
   onError,
 }: ImageCardProps) {
@@ -246,8 +244,7 @@ export function ImageCard({
       <div className="border-t border-surface-border p-4 space-y-4">
         <JsonEditor
           value={image.expectedJson}
-          onChange={onJsonChange}
-          onValidChange={onValidChange}
+          onChange={onJsonUpdate}
         />
 
         {/* Save button */}
