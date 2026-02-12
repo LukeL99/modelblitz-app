@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { nanoid } from "nanoid";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -165,6 +165,16 @@ export async function POST(request: NextRequest) {
         .from("benchmark_drafts")
         .update({ status: "paid" })
         .eq("id", draftId);
+
+      // Trigger benchmark execution (mirrors webhook behavior)
+      after(async () => {
+        try {
+          const { runBenchmark } = await import("@/lib/benchmark/engine");
+          await runBenchmark(report.id);
+        } catch (err) {
+          console.error("[checkout:mock:after] Benchmark engine error:", err);
+        }
+      });
 
       return NextResponse.json({ reportId: report.id });
     }

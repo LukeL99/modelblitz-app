@@ -9,6 +9,7 @@
 import { withBackoff } from "./backoff";
 import { CostTracker } from "./cost-tracker";
 import { getModelById } from "@/lib/config/models";
+import { isMockOpenRouter } from "@/lib/debug/mock-config";
 
 /**
  * Result of a single model benchmark run.
@@ -46,16 +47,8 @@ export interface RunParams {
   costTracker: CostTracker;
 }
 
-/**
- * Check if mock mode is enabled for OpenRouter calls.
- * Uses NEXT_PUBLIC_MOCK_OPENROUTER env var.
- */
-export function isMockOpenRouter(): boolean {
-  return (
-    process.env.NEXT_PUBLIC_MOCK_OPENROUTER === "true" ||
-    process.env.NEXT_PUBLIC_MOCK_OPENROUTER === "1"
-  );
-}
+// Re-export isMockOpenRouter from canonical mock-config (uses DEBUG_MOCK_OPENROUTER)
+export { isMockOpenRouter };
 
 /**
  * Generate a deterministic seed from a string (for consistent mock data per model).
