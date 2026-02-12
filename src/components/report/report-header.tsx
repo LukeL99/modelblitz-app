@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
 import type { ReportData } from "@/types/report";
 import { ShareButton } from "@/components/report/share-button";
 
 interface ReportHeaderProps {
   reportData: ReportData;
   shareToken: string;
+  children?: ReactNode;
 }
 
 function formatCompletedDate(isoDate: string | null): string {
@@ -18,7 +20,7 @@ function formatCompletedDate(isoDate: string | null): string {
   });
 }
 
-export function ReportHeader({ reportData, shareToken }: ReportHeaderProps) {
+export function ReportHeader({ reportData, shareToken, children }: ReportHeaderProps) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -39,7 +41,7 @@ export function ReportHeader({ reportData, shareToken }: ReportHeaderProps) {
 
         <div className="flex items-center gap-3">
           <ShareButton shareToken={shareToken} />
-          <div id="pdf-export-slot" />
+          {children}
         </div>
       </div>
     </div>
